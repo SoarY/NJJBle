@@ -1,3 +1,3 @@
-rootProject.name = "NjjSDKDemo"
+rootProject.name = "NJJBle"
 include ':NjjSdk'
 

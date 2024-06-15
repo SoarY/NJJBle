@@ -1,2 +1,2 @@
-# NJJBleSDK
+# NJJBle
 BLE SDK
