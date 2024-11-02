@@ -1,0 +1,6 @@
+rootProject.name = "NJJBle"
+//include ':sample:app'
+include ':library-ble'
+
+
+
