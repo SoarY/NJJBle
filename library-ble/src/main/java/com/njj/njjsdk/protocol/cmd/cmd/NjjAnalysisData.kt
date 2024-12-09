@@ -1,6 +1,8 @@
 package com.njj.njjsdk.protocol.cmd.cmd
 
 import com.njj.njjsdk.callback.*
+import com.njj.njjsdk.protocol.cmd.EVT_TYPE_GPS_SPORT
+import com.njj.njjsdk.protocol.cmd.TypeConstant.*
 import com.njj.njjsdk.protocol.cmd.uitls.TimeUtil
 import com.njj.njjsdk.protocol.entity.*
 import com.njj.njjsdk.utils.*
@@ -1022,6 +1024,88 @@ object NjjAnalysisData {
 //                LogUtil.e("somatosensoryGame==$somatosensoryGame")
                 SomatosensoryGameCallback.onReceiveData(somatosensoryGame)
             }
+        }
+    }
+
+    fun parserGPS(byteArray: ByteArray) {
+        val byte = byteArray[1].toInt() and (0xff)
+
+        val resLength = byteArray[3].toInt() and (0xff)
+        val resultByte = ByteArray(resLength)
+        System.arraycopy(byteArray, 4, resultByte, 0, resLength)
+        when (resultByte[0].toInt()) {
+
+            //请求gps定位权限
+            GPS_CMD_GPS -> {
+                GPSCallback.onGPSPermission()
+            }
+            //请求开始倒计时
+            GPS_CMD_COUNTDOWN -> {
+                GPSCallback.onGPSCountdown(resultByte[1].toInt() and 0xff)
+            }
+
+            //请求gps运动开始
+            GPS_CMD_START -> {
+                GPSCallback.onGPSStart(resultByte[1].toInt() and 0xff)
+            }
+
+            GPS_CMD_SYN -> {
+                var sportType = resultByte[2].toInt() and 0xff
+                val hr = resultByte[4].toInt() and 0xff
+
+                val time1 = resultByte[9].toInt() and 0xff
+                val time2 = (resultByte[10].toInt() and 0xff).shl(8)
+                val time3 = (resultByte[11].toInt() and 0xff).shl(16)
+                val time4 = (resultByte[12].toInt() and 0xff).shl(24)
+                val time = time1 + time2 + time3 + time4
+
+                val steps1 = resultByte[13].toInt() and 0xff
+                val steps2 = (resultByte[14].toInt() and 0xff).shl(8)
+                val steps3 = (resultByte[15].toInt() and 0xff).shl(16)
+                val steps4 = (resultByte[16].toInt() and 0xff).shl(24)
+                val steps = steps1 + steps2 + steps3 + steps4
+
+                val kcal1 = resultByte[17].toInt() and 0xff
+                val kcal2 = (resultByte[18].toInt() and 0xff).shl(8)
+                val kcal3 = (resultByte[19].toInt() and 0xff).shl(16)
+                val kcal4 = (resultByte[20].toInt() and 0xff).shl(24)
+                val kcal = kcal1 + kcal2 + kcal3 + kcal4
+
+                val distance1 = resultByte[21].toInt() and 0xff
+                val distance2 = (resultByte[22].toInt() and 0xff).shl(8)
+                val distance3 = (resultByte[23].toInt() and 0xff).shl(16)
+                val distance4 = (resultByte[24].toInt() and 0xff).shl(24)
+                val distance = distance1 + distance2 + distance3 + distance4
+
+                val speed1 = resultByte[21].toInt() and 0xff
+                val speed2 = (resultByte[22].toInt() and 0xff).shl(8)
+                val speed3 = (resultByte[23].toInt() and 0xff).shl(16)
+                val speed4 = (resultByte[24].toInt() and 0xff).shl(24)
+                val speed = speed1 + speed2 + speed3 + speed4
+
+                var gpsSportEntity = NJJGPSSportEntity()
+                gpsSportEntity.sportType = sportType
+                gpsSportEntity.sportHr = hr
+                gpsSportEntity.sportTime = time
+                gpsSportEntity.sportSteps = steps
+                gpsSportEntity.sportKcal = kcal
+                gpsSportEntity.sportDistance = distance
+                gpsSportEntity.sportSpeed = speed
+                GPSCallback.onGPSSync(gpsSportEntity)
+            }
+
+            GPS_CMD_PAUSE -> {
+                GPSCallback.onGPSPause(resultByte[1].toInt() and 0xff)
+            }
+
+            GPS_CMD_CONTINUE -> {
+                GPSCallback.onGPSContinue(resultByte[1].toInt() and 0xff)
+            }
+
+            GPS_CMD_END -> {
+                GPSCallback.onGPSEnd(resultByte[1].toInt() and 0xff)
+            }
+
         }
     }
 

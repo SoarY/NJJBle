@@ -322,8 +322,9 @@ const val EVT_TYPE_DEVICE_FUN    = 121 /*同步固件端支持功能+设备屏�
 
 
 const val EVT_TYPE_WATCH_CALL_INFO  = 122 /* 同步3.0 设备 MAC + 名称*/
-
+const val EVT_TYPE_GPS_SPORT      = 124 /* GPS运动 */
 const val EVT_TYPE_MOTION_GAME               = 126/* 体感游戏 */
+const val EVT_TYPE_STOCK        = 138  /*股票*/
 /**
  * OTA 开始指令
  */

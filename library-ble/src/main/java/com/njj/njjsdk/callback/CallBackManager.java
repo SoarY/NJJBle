@@ -25,6 +25,8 @@ public final class CallBackManager {
     private List<Mac3CallBack.ICallBack> mMac3CallBackList = new ArrayList<>();
 
     private final List<GPSCallback.ICallBack> mGPSCallback = new ArrayList<>();
+
+    private final List<NjjStockCallback.ICallBack> mStockCallback=new ArrayList<>();
     /**
      * 单例
      */
@@ -125,5 +127,23 @@ public final class CallBackManager {
 
     public List<GPSCallback.ICallBack> getGPSCallback() {
         return mGPSCallback;
+    }
+
+
+
+    public void registerStockCallback(NjjStockCallback.ICallBack callBack) {
+        if (!mStockCallback.contains(callBack) && callBack != null) {
+            mStockCallback.add(callBack);
+        }
+    }
+
+    public void unregisterStockCallback(NjjStockCallback.ICallBack callBack) {
+        if (!mStockCallback.contains(callBack) && callBack != null) {
+            mStockCallback.remove(callBack);
+        }
+    }
+
+    public List<NjjStockCallback.ICallBack> getStockCallback() {
+        return mStockCallback;
     }
 }

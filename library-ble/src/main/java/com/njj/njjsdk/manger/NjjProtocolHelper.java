@@ -6,29 +6,28 @@ import com.njj.njjsdk.callback.NjjBatteryCallBack;
 import com.njj.njjsdk.callback.NjjConfig1CallBack;
 import com.njj.njjsdk.callback.NjjDeviceFunCallback;
 import com.njj.njjsdk.callback.NjjECGCallBack;
-import com.njj.njjsdk.callback.NjjPushOtaCallback;
-import com.njj.njjsdk.callback.NjjWriteCallback;
 import com.njj.njjsdk.callback.NjjFirmwareCallback;
 import com.njj.njjsdk.callback.NjjHomeDataCallBack;
 import com.njj.njjsdk.callback.NjjNotifyCallback;
-import com.njj.njjsdk.protocol.cmd.NjjCmdToDeviceWrapper;
+import com.njj.njjsdk.callback.NjjPushOtaCallback;
+import com.njj.njjsdk.callback.NjjWriteCallback;
 import com.njj.njjsdk.protocol.cmd.INjjCmdToDeviceWrapper;
+import com.njj.njjsdk.protocol.cmd.NjjCmdToDeviceWrapper;
+import com.njj.njjsdk.protocol.entity.EmergencyContact;
+import com.njj.njjsdk.protocol.entity.NJJGPSSportEntity;
 import com.njj.njjsdk.protocol.entity.NJJWeatherData;
 import com.njj.njjsdk.protocol.entity.NjjAlarmClockInfo;
 import com.njj.njjsdk.protocol.entity.NjjBloodOxyData;
 import com.njj.njjsdk.protocol.entity.NjjBloodPressure;
-import com.njj.njjsdk.protocol.entity.NjjCommonSetEntity;
-import com.njj.njjsdk.protocol.entity.EmergencyContact;
 import com.njj.njjsdk.protocol.entity.NjjDeviceInfoData;
 import com.njj.njjsdk.protocol.entity.NjjDisturbEntity;
 import com.njj.njjsdk.protocol.entity.NjjDrinkWaterEntity;
 import com.njj.njjsdk.protocol.entity.NjjHeartData;
 import com.njj.njjsdk.protocol.entity.NjjLongSitEntity;
-import com.njj.njjsdk.protocol.entity.NjjSleepDetail;
+import com.njj.njjsdk.protocol.entity.NjjRunDetailsInfoData;
 import com.njj.njjsdk.protocol.entity.NjjSleepInfo;
 import com.njj.njjsdk.protocol.entity.NjjStepData;
 import com.njj.njjsdk.protocol.entity.NjjSyncWeatherData;
-import com.njj.njjsdk.protocol.entity.NjjRunDetailsInfoData;
 import com.njj.njjsdk.protocol.entity.NjjWashHandEntity;
 import com.njj.njjsdk.protocol.entity.NjjWristScreenEntity;
 
@@ -491,7 +490,23 @@ public class NjjProtocolHelper {
         njjCmdToDeviceWrapper.startPushBigDial(type, data, callback);
     }
 
+    public void startGPSStatus(int type,int status){
+        njjCmdToDeviceWrapper.startGPSStatus(type,status);
+    }
 
+    public void syncGPSData(NJJGPSSportEntity gpsSportEntity){
+        njjCmdToDeviceWrapper.syncGPSStatus(gpsSportEntity);
+    }
+
+
+    public void sendGPSStatus(int type,int sportId){
+        njjCmdToDeviceWrapper.sendGPSStatus(type,sportId);
+    }
+
+
+    public void startGPSData(byte[] buffer) {
+        njjCmdToDeviceWrapper.startGPSData(buffer);
+    }
     /**
      * 获取闹钟信息
      *
@@ -539,7 +554,16 @@ public class NjjProtocolHelper {
         njjCmdToDeviceWrapper.setMotionGameStatus(type);
     }
 
+    /**
+     * 一周天气
+     * @param data
+     */
     public void syncWeekWeatherTypeData(List<NJJWeatherData>  data){
         njjCmdToDeviceWrapper.syncWeekWeatherTypeData(data);
+    }
+
+    public void sendStock(int count,int id,String code,String companyName,String currentPrice,String changePercent) {
+        if (njjCmdToDeviceWrapper!=null)
+            njjCmdToDeviceWrapper.sendStock(count,id,code,companyName,currentPrice,changePercent);
     }
 }

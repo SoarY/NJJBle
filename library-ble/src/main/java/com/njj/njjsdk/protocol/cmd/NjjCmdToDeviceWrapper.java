@@ -1,55 +1,55 @@
 package com.njj.njjsdk.protocol.cmd;
 
 
-import static com.njj.njjsdk.protocol.cmd.CmdConstKt.EVT_TYPE_WEATHER_FORECAST;
-
 import com.njj.njjsdk.callback.Mac3CallBack;
 import com.njj.njjsdk.callback.NjBtNameCallback;
+import com.njj.njjsdk.callback.NjjBatteryCallBack;
 import com.njj.njjsdk.callback.NjjConfig1CallBack;
 import com.njj.njjsdk.callback.NjjDeviceFunCallback;
+import com.njj.njjsdk.callback.NjjECGCallBack;
+import com.njj.njjsdk.callback.NjjFirmwareCallback;
+import com.njj.njjsdk.callback.NjjHomeDataCallBack;
+import com.njj.njjsdk.callback.NjjNotifyCallback;
+import com.njj.njjsdk.callback.NjjPushOtaCallback;
+import com.njj.njjsdk.callback.NjjStockCallback;
+import com.njj.njjsdk.callback.NjjWriteCallback;
 import com.njj.njjsdk.library.Code;
 import com.njj.njjsdk.library.Constants;
 import com.njj.njjsdk.library.connect.response.BleNotifyResponse;
 import com.njj.njjsdk.library.connect.response.BleWriteResponse;
-import com.njj.njjsdk.callback.NjjBatteryCallBack;
-import com.njj.njjsdk.callback.NjjECGCallBack;
-import com.njj.njjsdk.callback.NjjPushOtaCallback;
-import com.njj.njjsdk.callback.NjjWriteCallback;
-import com.njj.njjsdk.callback.NjjFirmwareCallback;
-
-import com.njj.njjsdk.callback.NjjHomeDataCallBack;
-import com.njj.njjsdk.callback.NjjNotifyCallback;
 import com.njj.njjsdk.manger.NjjBleManger;
-import com.njj.njjsdk.protocol.cmd.cmd.NjjAnalysisData;
 import com.njj.njjsdk.protocol.cmd.cmd.CmdMergeImpl;
+import com.njj.njjsdk.protocol.cmd.cmd.NjjAnalysisData;
+import com.njj.njjsdk.protocol.entity.EmergencyContact;
+import com.njj.njjsdk.protocol.entity.NJJGPSSportEntity;
 import com.njj.njjsdk.protocol.entity.NJJWeatherData;
 import com.njj.njjsdk.protocol.entity.NjjAlarmClockInfo;
 import com.njj.njjsdk.protocol.entity.NjjBloodOxyData;
 import com.njj.njjsdk.protocol.entity.NjjBloodPressure;
-import com.njj.njjsdk.protocol.entity.EmergencyContact;
 import com.njj.njjsdk.protocol.entity.NjjDeviceInfoData;
 import com.njj.njjsdk.protocol.entity.NjjDisturbEntity;
 import com.njj.njjsdk.protocol.entity.NjjDrinkWaterEntity;
 import com.njj.njjsdk.protocol.entity.NjjHeartData;
 import com.njj.njjsdk.protocol.entity.NjjLongSitEntity;
+import com.njj.njjsdk.protocol.entity.NjjRunDetailsInfoData;
 import com.njj.njjsdk.protocol.entity.NjjSleepInfo;
 import com.njj.njjsdk.protocol.entity.NjjStepData;
 import com.njj.njjsdk.protocol.entity.NjjSyncWeatherData;
-import com.njj.njjsdk.protocol.entity.NjjRunDetailsInfoData;
 import com.njj.njjsdk.protocol.entity.NjjWashHandEntity;
 import com.njj.njjsdk.protocol.entity.NjjWristScreenEntity;
 import com.njj.njjsdk.utils.ByteAndStringUtil;
 import com.njj.njjsdk.utils.LogUtil;
-
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-
 import io.reactivex.Observable;
 import io.reactivex.Observer;
+
+import static com.njj.njjsdk.protocol.cmd.CmdConstKt.EVT_TYPE_GPS_SPORT;
+import static com.njj.njjsdk.protocol.cmd.CmdConstKt.EVT_TYPE_WEATHER_FORECAST;
 
 /**
  * 发送命令实现类
@@ -602,10 +602,10 @@ public class NjjCmdToDeviceWrapper implements INjjCmdToDeviceWrapper {
     }
 
     @Override
-    public void modifyBtName(String btName,NjBtNameCallback tnjBtNameCallback) {
+    public void modifyBtName(String btName, NjBtNameCallback tnjBtNameCallback) {
         byte[] bytes = CmdMergeImpl.INSTANCE.modifyBtName(CmdConstKt.EVT_TYPE_BT_NAME, btName);
         NjjBleManger.getInstance().writeData(bytes);
-        btNameCallback=tnjBtNameCallback;
+        btNameCallback = tnjBtNameCallback;
     }
 
 
@@ -737,6 +737,11 @@ public class NjjCmdToDeviceWrapper implements INjjCmdToDeviceWrapper {
 
     }
 
+    public void sendStock(int count, int id, String code, String companyName, String currentPrice, String changePercent) {
+        byte[] bytes = CmdMergeImpl.INSTANCE.sendStock(count, id, code, companyName, currentPrice, changePercent);
+        NjjBleManger.getInstance().writeData(bytes);
+    }
+
     @Override
     public void startPushDial(int type, byte[] buffer, NjjPushOtaCallback callback) {
         byte[] bytes = CmdMergeImpl.INSTANCE.startSendDial(buffer, type);
@@ -771,11 +776,11 @@ public class NjjCmdToDeviceWrapper implements INjjCmdToDeviceWrapper {
         NjjBleManger.getInstance().writeDailRuiYu(command, code -> {
             int a = command[4] & 0xff;
             int b = (command[5] & 0xff) << 8;
-            int position=a+b;
+            int position = a + b;
             if (code == Constants.REQUEST_SUCCESS) {
 //                LogUtil.e("发送成功=======" +position);
                 njjPushOtaCallback.onPushProgress(position);
-            }else {
+            } else {
                 LogUtil.e("发送失败=======");
             }
         });
@@ -790,11 +795,11 @@ public class NjjCmdToDeviceWrapper implements INjjCmdToDeviceWrapper {
             int b = (command[5] & 0xff) << 8;
             int c = (command[6] & 0xff) << 16;
             int d = (command[7] & 0xff) << 24;
-            int position=a+b+c+d;
+            int position = a + b + c + d;
             if (code == Constants.REQUEST_SUCCESS) {
 //                LogUtil.e("发送成功=======" +position);
                 njjPushOtaCallback.onPushProgress(position);
-            }else {
+            } else {
                 LogUtil.e("发送失败=======");
             }
         });
@@ -845,6 +850,31 @@ public class NjjCmdToDeviceWrapper implements INjjCmdToDeviceWrapper {
         byte[] bytes = CmdMergeImpl.INSTANCE.setForecastWeather(EVT_TYPE_WEATHER_FORECAST, data);
         NjjBleManger.getInstance().writeData(bytes);
     }
+
+    @Override
+    public void startGPSStatus(int type, int status) {
+        byte[] bytes = CmdMergeImpl.INSTANCE.creatBaseGPSData(EVT_TYPE_GPS_SPORT, type, status);
+        NjjBleManger.getInstance().writeData(bytes);
+    }
+
+    @Override
+    public void syncGPSStatus(NJJGPSSportEntity gpsSportEntity) {
+        byte[] bytes = CmdMergeImpl.INSTANCE.syncGPSData(gpsSportEntity);
+        NjjBleManger.getInstance().writeData(bytes);
+    }
+
+    @Override
+    public void sendGPSStatus(int type, int sportId) {
+        byte[] bytes = CmdMergeImpl.INSTANCE.creatBaseGPSData(EVT_TYPE_GPS_SPORT, type, sportId);
+        NjjBleManger.getInstance().writeData(bytes);
+    }
+
+    @Override
+    public void startGPSData(byte[] buffer) {
+        byte[] bytes = CmdMergeImpl.INSTANCE.startGPS(buffer);
+        NjjBleManger.getInstance().writeData(bytes);
+    }
+
     @Override
     public Observable<NjjRunDetailsInfoData> syncSportRecord() {
         byte[] bytes = CmdMergeImpl.INSTANCE.receiveSportRecord();
@@ -899,7 +929,7 @@ public class NjjCmdToDeviceWrapper implements INjjCmdToDeviceWrapper {
                 LogUtil.i("通知打开成功可以开始通讯了....");
                 String macAddress = NjjBleManger.getInstance().getmBleDevice().getDevice().getAddress();
                 NjjBleManger.getInstance().requestMtu(macAddress, 512, (i, integer) -> {
-                    NjjBleManger.getInstance().discoveredServices(code,macAddress);
+                    NjjBleManger.getInstance().discoveredServices(code, macAddress);
                     LogUtil.e("打开mtu " + i + " Integer=" + integer);
                 });
                 setPhoneType();
@@ -1023,7 +1053,7 @@ public class NjjCmdToDeviceWrapper implements INjjCmdToDeviceWrapper {
                 if (homeDataCallBack != null)
                     NjjAnalysisData.INSTANCE.parserHomeData(value, homeDataCallBack);
                 break;
-            case (byte) CmdConstKt. EVT_TYPE_OTA_BIG_START:
+            case (byte) CmdConstKt.EVT_TYPE_OTA_BIG_START:
             case (byte) CmdConstKt.EVT_TYPE_OTA_START:
                 if (njjPushOtaCallback != null)
                     NjjAnalysisData.INSTANCE.parserOTAStart(value, njjPushOtaCallback);
@@ -1055,12 +1085,16 @@ public class NjjCmdToDeviceWrapper implements INjjCmdToDeviceWrapper {
                 break;
 
             case CmdConstKt.EVT_TYPE_BT_NAME:
-
-                NjjAnalysisData.INSTANCE.parserBtName(value,btNameCallback);
+                NjjAnalysisData.INSTANCE.parserBtName(value, btNameCallback);
+                break;
+            case CmdConstKt.EVT_TYPE_GPS_SPORT:
+                NjjAnalysisData.INSTANCE.parserGPS(value);
+                break;
+            case (byte) CmdConstKt.EVT_TYPE_STOCK:
+                NjjStockCallback.onReceiveData();
                 break;
         }
     }
-
 
     @Override
     public void removeHomeDataCallBack() {
@@ -1075,7 +1109,6 @@ public class NjjCmdToDeviceWrapper implements INjjCmdToDeviceWrapper {
     public void removeSingleHeartOxBloodCallback() {
         singleHeartOxBloodCallback = null;
     }
-
 
 
 }

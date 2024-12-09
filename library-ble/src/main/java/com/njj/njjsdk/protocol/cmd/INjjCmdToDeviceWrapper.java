@@ -12,6 +12,7 @@ import com.njj.njjsdk.callback.NjjNotifyCallback;
 import com.njj.njjsdk.callback.NjjPushOtaCallback;
 import com.njj.njjsdk.callback.NjjWriteCallback;
 import com.njj.njjsdk.protocol.entity.EmergencyContact;
+import com.njj.njjsdk.protocol.entity.NJJGPSSportEntity;
 import com.njj.njjsdk.protocol.entity.NJJWeatherData;
 import com.njj.njjsdk.protocol.entity.NjjAlarmClockInfo;
 import com.njj.njjsdk.protocol.entity.NjjBloodOxyData;
@@ -426,4 +427,14 @@ public interface INjjCmdToDeviceWrapper {
     void setMotionGameStatus(int type);
 
     void syncWeekWeatherTypeData(List<NJJWeatherData> data);
+
+    void startGPSStatus(int type, int status);
+
+    void syncGPSStatus(NJJGPSSportEntity gpsSportEntity);
+
+    void sendGPSStatus(int type, int sportId);
+
+    void startGPSData(byte[] buffer);
+
+    void sendStock(int count,int id,String code,String companyName,String currentPrice,String changePercent);
 }

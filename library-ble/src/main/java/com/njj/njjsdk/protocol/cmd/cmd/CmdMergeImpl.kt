@@ -2,6 +2,7 @@ package com.njj.njjsdk.protocol.cmd.cmd
 
 import android.text.TextUtils
 import com.njj.njjsdk.protocol.cmd.*
+import com.njj.njjsdk.protocol.cmd.TypeConstant.GPS_CMD_SYN
 
 
 import com.njj.njjsdk.protocol.cmd.uitls.AlarmCycleImpl
@@ -1212,6 +1213,129 @@ object CmdMergeImpl {
 
 
         return cmdData
+    }
+
+    fun creatBaseGPSData(cmdType: Int, type: Int, status: Int): ByteArray {
+        val cmdData = createBaseCmdByte(3, cmdType, BLE_CTRL_WRITE)
+        cmdData[4] = type.toByte()
+        cmdData[5] = status.toByte()
+        cmdData[6] = (cmdData[4] + cmdData[5]).toByte()
+        return cmdData
+    }
+    fun startGPS(binArray: ByteArray): ByteArray {
+        return startSendDial(binArray, 0x06)
+    }
+
+
+    fun syncGPSData(gpsSportEntity: NJJGPSSportEntity): ByteArray {
+        val cmdData = createBaseCmdByte(29 + 1, EVT_TYPE_GPS_SPORT, BLE_CTRL_WRITE)
+        cmdData[4] = GPS_CMD_SYN.toByte()
+        cmdData[5] = 0
+        cmdData[6] = gpsSportEntity.sportType.toByte()
+        cmdData[7] = 0
+        cmdData[8] = 0
+        cmdData[9] = gpsSportEntity.sportValid.toByte()
+        cmdData[10] = gpsSportEntity.sportCadence.toByte()
+        cmdData[11] = gpsSportEntity.sportStride.toByte()
+        cmdData[12] = 0
+
+        //时间
+        cmdData[13] = (gpsSportEntity.sportTime and (0xff)).toByte()
+        cmdData[14] = ((gpsSportEntity.sportTime.shr(8) and (0xff))).toByte()
+        cmdData[15] = ((gpsSportEntity.sportTime.shr(16) and (0xff))).toByte()
+        cmdData[16] = ((gpsSportEntity.sportTime.shr(24) and (0xff))).toByte()
+
+        //步数
+        cmdData[17] = (gpsSportEntity.sportSteps and (0xff)).toByte()
+        cmdData[18] = ((gpsSportEntity.sportSteps.shr(8) and (0xff))).toByte()
+        cmdData[19] = ((gpsSportEntity.sportSteps.shr(16) and (0xff))).toByte()
+        cmdData[20] = ((gpsSportEntity.sportSteps.shr(24) and (0xff))).toByte()
+
+        //卡路里
+        cmdData[21] = (gpsSportEntity.sportKcal and (0xff)).toByte()
+        cmdData[22] = ((gpsSportEntity.sportKcal.shr(8) and (0xff))).toByte()
+        cmdData[23] = ((gpsSportEntity.sportKcal.shr(16) and (0xff))).toByte()
+        cmdData[24] = ((gpsSportEntity.sportKcal.shr(24) and (0xff))).toByte()
+
+        //距离
+        cmdData[25] = (gpsSportEntity.sportDistance and (0xff)).toByte()
+        cmdData[26] = ((gpsSportEntity.sportDistance.shr(8) and (0xff))).toByte()
+        cmdData[27] = ((gpsSportEntity.sportDistance.shr(16) and (0xff))).toByte()
+        cmdData[28] = ((gpsSportEntity.sportDistance.shr(24) and (0xff))).toByte()
+
+        //公里 	（小时）
+        cmdData[29] = (gpsSportEntity.sportSpeed and (0xff)).toByte()
+        cmdData[30] = ((gpsSportEntity.sportSpeed.shr(8) and (0xff))).toByte()
+        cmdData[31] = ((gpsSportEntity.sportSpeed.shr(16) and (0xff))).toByte()
+        cmdData[32] = ((gpsSportEntity.sportSpeed.shr(24) and (0xff))).toByte()
+
+        for (i in 4 until cmdData.size - 1) {
+            cmdData[33] = (cmdData[33] + cmdData[i]).toByte()
+        }
+
+        return cmdData
+    }
+
+    fun sendStock(
+        count: Int,
+        id: Int,
+        code: String,
+        companyName: String,
+        currentPrice: String,
+        changePercent: String
+    ): ByteArray {
+        var codeArray: ByteArray =
+            if (TextUtils.isEmpty(code)) ("").toByteArray() else (code).toByteArray()
+        val codeSize = codeArray.size
+        var companyNameArray: ByteArray =
+            if (TextUtils.isEmpty(companyName)) ("").toByteArray() else (companyName).toByteArray()
+        var companyNameSize = companyNameArray.size
+        var currentPriceArray: ByteArray =
+            if (TextUtils.isEmpty(currentPrice)) ("").toByteArray() else (currentPrice).toByteArray()
+        val currentPriceSize = currentPriceArray.size
+        var changePercentArray: ByteArray =
+            if (TextUtils.isEmpty(changePercent)) ("").toByteArray() else (changePercent).toByteArray()
+        val changePercentSize = changePercentArray.size
+
+        if (companyNameSize > 60)
+            companyNameSize = 60
+
+        val stockDataSize = 12 + 12 + 16 + companyNameSize
+        var bytes = createBaseCmdByte(3 + stockDataSize, EVT_TYPE_STOCK, BLE_CTRL_WRITE)
+
+        bytes[4] = count.toByte()
+        bytes[5] = id.toByte()
+
+        //固定的字节不够的补0,超过的截取
+        currentPriceArray = processByteArray(currentPriceArray, 12)
+        changePercentArray = processByteArray(changePercentArray, 12)
+        codeArray = processByteArray(codeArray, 16)
+
+        if (companyNameArray.size > 60)
+            companyNameArray = companyNameArray.copyOfRange(0, 60)
+
+
+        System.arraycopy(currentPriceArray, 0, bytes, 6, 12)
+        System.arraycopy(changePercentArray, 0, bytes, 6 + 12, 12)
+        System.arraycopy(codeArray, 0, bytes, 6 + 12 + 12, 16)
+        System.arraycopy(companyNameArray, 0, bytes, 6 + 12 + 12 + 16, companyNameArray.size)
+
+        var checkData = 0
+        for (index in bytes.indices) {
+            if (index >= 4)
+                checkData += bytes[index].toInt()
+        }
+        bytes[bytes.size - 1] = checkData.toByte()
+        return bytes
+    }
+
+
+    private fun processByteArray(input: ByteArray, targetLength: Int): ByteArray {
+        return if (input.size > targetLength) {
+            input.copyOfRange(0, targetLength)
+        } else {
+            input.copyOf(targetLength)
+        }
     }
 
 }
