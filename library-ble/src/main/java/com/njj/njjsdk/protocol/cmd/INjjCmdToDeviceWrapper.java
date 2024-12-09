@@ -1,32 +1,30 @@
 package com.njj.njjsdk.protocol.cmd;
 
 
-
 import com.njj.njjsdk.callback.NjBtNameCallback;
 import com.njj.njjsdk.callback.NjjBatteryCallBack;
 import com.njj.njjsdk.callback.NjjConfig1CallBack;
 import com.njj.njjsdk.callback.NjjDeviceFunCallback;
 import com.njj.njjsdk.callback.NjjECGCallBack;
-import com.njj.njjsdk.callback.NjjPushOtaCallback;
-import com.njj.njjsdk.callback.NjjWriteCallback;
 import com.njj.njjsdk.callback.NjjFirmwareCallback;
 import com.njj.njjsdk.callback.NjjHomeDataCallBack;
 import com.njj.njjsdk.callback.NjjNotifyCallback;
+import com.njj.njjsdk.callback.NjjPushOtaCallback;
+import com.njj.njjsdk.callback.NjjWriteCallback;
+import com.njj.njjsdk.protocol.entity.EmergencyContact;
+import com.njj.njjsdk.protocol.entity.NJJWeatherData;
 import com.njj.njjsdk.protocol.entity.NjjAlarmClockInfo;
 import com.njj.njjsdk.protocol.entity.NjjBloodOxyData;
 import com.njj.njjsdk.protocol.entity.NjjBloodPressure;
-import com.njj.njjsdk.protocol.entity.NjjCommonSetEntity;
-import com.njj.njjsdk.protocol.entity.EmergencyContact;
 import com.njj.njjsdk.protocol.entity.NjjDeviceInfoData;
 import com.njj.njjsdk.protocol.entity.NjjDisturbEntity;
 import com.njj.njjsdk.protocol.entity.NjjDrinkWaterEntity;
 import com.njj.njjsdk.protocol.entity.NjjHeartData;
 import com.njj.njjsdk.protocol.entity.NjjLongSitEntity;
-import com.njj.njjsdk.protocol.entity.NjjSleepDetail;
+import com.njj.njjsdk.protocol.entity.NjjRunDetailsInfoData;
 import com.njj.njjsdk.protocol.entity.NjjSleepInfo;
 import com.njj.njjsdk.protocol.entity.NjjStepData;
 import com.njj.njjsdk.protocol.entity.NjjSyncWeatherData;
-import com.njj.njjsdk.protocol.entity.NjjRunDetailsInfoData;
 import com.njj.njjsdk.protocol.entity.NjjWashHandEntity;
 import com.njj.njjsdk.protocol.entity.NjjWristScreenEntity;
 
@@ -426,4 +424,6 @@ public interface INjjCmdToDeviceWrapper {
     void removeSingleHeartOxBloodCallback();
 
     void setMotionGameStatus(int type);
+
+    void syncWeekWeatherTypeData(List<NJJWeatherData> data);
 }

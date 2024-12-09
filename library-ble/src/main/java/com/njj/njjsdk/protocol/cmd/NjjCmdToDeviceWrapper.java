@@ -1,6 +1,8 @@
 package com.njj.njjsdk.protocol.cmd;
 
 
+import static com.njj.njjsdk.protocol.cmd.CmdConstKt.EVT_TYPE_WEATHER_FORECAST;
+
 import com.njj.njjsdk.callback.Mac3CallBack;
 import com.njj.njjsdk.callback.NjBtNameCallback;
 import com.njj.njjsdk.callback.NjjConfig1CallBack;
@@ -20,6 +22,7 @@ import com.njj.njjsdk.callback.NjjNotifyCallback;
 import com.njj.njjsdk.manger.NjjBleManger;
 import com.njj.njjsdk.protocol.cmd.cmd.NjjAnalysisData;
 import com.njj.njjsdk.protocol.cmd.cmd.CmdMergeImpl;
+import com.njj.njjsdk.protocol.entity.NJJWeatherData;
 import com.njj.njjsdk.protocol.entity.NjjAlarmClockInfo;
 import com.njj.njjsdk.protocol.entity.NjjBloodOxyData;
 import com.njj.njjsdk.protocol.entity.NjjBloodPressure;
@@ -837,6 +840,11 @@ public class NjjCmdToDeviceWrapper implements INjjCmdToDeviceWrapper {
         LogUtil.e("ry 体感 游戏..............." + type);
     }
 
+    @Override
+    public void syncWeekWeatherTypeData(List<NJJWeatherData> data) {
+        byte[] bytes = CmdMergeImpl.INSTANCE.setForecastWeather(EVT_TYPE_WEATHER_FORECAST, data);
+        NjjBleManger.getInstance().writeData(bytes);
+    }
     @Override
     public Observable<NjjRunDetailsInfoData> syncSportRecord() {
         byte[] bytes = CmdMergeImpl.INSTANCE.receiveSportRecord();

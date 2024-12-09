@@ -8,10 +8,10 @@ import android.text.TextUtils;
 import com.njj.njjsdk.callback.NjjPushOtaCallback;
 import com.njj.njjsdk.library.Constants;
 
-import com.njj.njjsdk.protocol.cmd.CmdConstKt;
 import com.njj.njjsdk.protocol.cmd.cmd.CmdMergeImpl;
 import com.njj.njjsdk.protocol.entity.BLEDevice;
 import com.njj.njjsdk.protocol.entity.EmergencyContact;
+import com.njj.njjsdk.protocol.entity.NJJGPSSportEntity;
 import com.njj.njjsdk.utils.BleBeaconUtil;
 import com.njj.njjsdk.utils.LogUtil;
 import com.njj.njjsdk.utils.NJJLog;
@@ -555,6 +555,44 @@ public class NjjPushDataHelper {
 
         }
         destroyTimer();
+    }
+
+    public void startGPSOTA(String url, NJJGPSSportEntity gpsSportEntity, List<Integer> speeds,
+                            int extremity, int anaerobic, int aerobic, int burning, int warm,int height,int width,
+                            NJjPushListener pushListener) {
+        this.type=0x06;
+        this.pushListener = pushListener;
+        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+
+                    checkGPSDATA(url, speeds, gpsSportEntity, speeds.size(), extremity, anaerobic, aerobic, burning, warm,height,width);
+                    emitter.onNext(true);
+                }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
+
+    private void checkGPSDATA(String url, List<Integer> speeds, NJJGPSSportEntity gpsSportEntity, int valid, int extremity,
+                              int anaerobic, int aerobic, int burning, int warm, int height, int width) {
+
+
+/*        DeviceAdapterBean deviceAdapterBean = BleDataCache.getInstance().getDeviceAdapterBean();
+        needWidth = deviceAdapterBean.getWidth();
+        needHeight = deviceAdapterBean.getHeight();*/
+
+        Bitmap bitmap = NjjUtils.getSmallBitmap(
+                BitmapFactory.decodeFile(url),
+                width, height);
+
+        byte[] gpsData = CmdMergeImpl.INSTANCE.getGPSData(gpsSportEntity);
+        byte[] speedBytes = CmdMergeImpl.INSTANCE.getOther(speeds, valid, extremity, anaerobic, aerobic, burning, warm);
+        byte[] bgbByte = getBufferByBitmap(bitmap);
+
+        buffer = new byte[gpsData.length + speedBytes.length + bgbByte.length];
+
+        System.arraycopy(gpsData, 0, buffer, 0, gpsData.length);
+        System.arraycopy(speedBytes, 0, buffer, gpsData.length, speedBytes.length);
+        System.arraycopy(bgbByte, 0, buffer, gpsData.length + speedBytes.length, bgbByte.length);
+
     }
 
 

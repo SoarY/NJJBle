@@ -13,6 +13,7 @@ import com.njj.njjsdk.callback.NjjHomeDataCallBack;
 import com.njj.njjsdk.callback.NjjNotifyCallback;
 import com.njj.njjsdk.protocol.cmd.NjjCmdToDeviceWrapper;
 import com.njj.njjsdk.protocol.cmd.INjjCmdToDeviceWrapper;
+import com.njj.njjsdk.protocol.entity.NJJWeatherData;
 import com.njj.njjsdk.protocol.entity.NjjAlarmClockInfo;
 import com.njj.njjsdk.protocol.entity.NjjBloodOxyData;
 import com.njj.njjsdk.protocol.entity.NjjBloodPressure;
@@ -536,5 +537,9 @@ public class NjjProtocolHelper {
      */
     public void setMotionGameStatus(int type){
         njjCmdToDeviceWrapper.setMotionGameStatus(type);
+    }
+
+    public void syncWeekWeatherTypeData(List<NJJWeatherData>  data){
+        njjCmdToDeviceWrapper.syncWeekWeatherTypeData(data);
     }
 }

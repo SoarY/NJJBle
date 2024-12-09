@@ -1097,8 +1097,122 @@ object CmdMergeImpl {
         return byteArray
     }
 
+    fun setForecastWeather(cmdType: Int, weathers: MutableList<NJJWeatherData>): ByteArray {
+        var count = 16
+        val cmdData = createBaseCmdByte(1 + weathers.size * count, cmdType, BLE_CTRL_WRITE)
+        cmdData[cmdData.size - 1] = 0x00
+
+        for (index in weathers.indices) {
+            cmdData[4 + index * count] = weathers[index].week.toByte()
+            cmdData[5 + index * count] = weathers[index].weatherType.toByte()
+            cmdData[6 + index * count] = weathers[index].highestTemp.toByte()
+            cmdData[7 + index * count] = weathers[index].minimumTemp.toByte()
+            cmdData[8 + index * count] = (weathers[index].pressure.toInt() and (0xff)).toByte()
+            cmdData[9 + index * count] =
+                ((weathers[index].pressure.toInt().shr(8) and (0xff))).toByte()
+            cmdData[10 + index * count] = weathers[index].ultLevel.toByte()
+            cmdData[11 + index * count] = weathers[index].humidity.toByte()
+            cmdData[12 + index * count] = weathers[index].windDirDay.toByte()
+            cmdData[13 + index * count] = weathers[index].windScaleDay.toInt().toByte()
+            cmdData[14 + index * count] = (weathers[index].vis and (0xff)).toByte()
+            cmdData[15 + index * count] = ((weathers[index].vis.shr(8) and (0xff))).toByte()
+            cmdData[16 + index * count] = (weathers[index].precip and (0xff)).toByte()
+            cmdData[17 + index * count] = ((weathers[index].precip.shr(8) and (0xff))).toByte()
+            cmdData[18 + index * count] = 0x00
+            cmdData[19 + index * count] = 0x00
+            cmdData[cmdData.size - 1] =
+                (cmdData[cmdData.size - 1] + cmdData[4 + index * count] + cmdData[5 + index * count] +
+                        cmdData[6 + index * count] + cmdData[7 + index * count] + cmdData[8 + index * count] +
+                        cmdData[9 + index * count] + cmdData[10 + index * count] + cmdData[11 + index * count] +
+                        cmdData[12 + index * count] + cmdData[13 + index * count] + cmdData[14 + index * count] +
+                        cmdData[15 + index * count] + cmdData[16 + index * count] + cmdData[17 + index * count] +
+                        cmdData[18 + index * count] + cmdData[19 + index * count]).toByte()
+        }
+
+        return cmdData
+    }
+
+    fun getGPSData(gpsSportEntity: NJJGPSSportEntity): ByteArray {
+        val cmdData = ByteArray(28)
+        cmdData[0] = 0
+        cmdData[1] = gpsSportEntity.sportType.toByte()
+        cmdData[2] = 0
+        cmdData[3] = gpsSportEntity.sportHr.toByte()
+        cmdData[4] = gpsSportEntity.sportValid.toByte()
+        cmdData[5] = gpsSportEntity.sportCadence.toByte()
+        cmdData[6] = gpsSportEntity.sportStride.toByte()
+        cmdData[7] = 0
+
+        //时间
+        cmdData[8] = (gpsSportEntity.sportTime and (0xff)).toByte()
+        cmdData[9] = ((gpsSportEntity.sportTime.shr(8) and (0xff))).toByte()
+        cmdData[10] = ((gpsSportEntity.sportTime.shr(16) and (0xff))).toByte()
+        cmdData[11] = ((gpsSportEntity.sportTime.shr(24) and (0xff))).toByte()
+
+        //步数
+        cmdData[12] = (gpsSportEntity.sportSteps and (0xff)).toByte()
+        cmdData[13] = ((gpsSportEntity.sportSteps.shr(8) and (0xff))).toByte()
+        cmdData[14] = ((gpsSportEntity.sportSteps.shr(16) and (0xff))).toByte()
+        cmdData[15] = ((gpsSportEntity.sportSteps.shr(24) and (0xff))).toByte()
+
+        //卡路里
+        cmdData[16] = (gpsSportEntity.sportKcal and (0xff)).toByte()
+        cmdData[17] = ((gpsSportEntity.sportKcal.shr(8) and (0xff))).toByte()
+        cmdData[18] = ((gpsSportEntity.sportKcal.shr(16) and (0xff))).toByte()
+        cmdData[19] = ((gpsSportEntity.sportKcal.shr(24) and (0xff))).toByte()
+
+        //距离
+        cmdData[20] = (gpsSportEntity.sportDistance and (0xff)).toByte()
+        cmdData[21] = ((gpsSportEntity.sportDistance.shr(8) and (0xff))).toByte()
+        cmdData[22] = ((gpsSportEntity.sportDistance.shr(16) and (0xff))).toByte()
+        cmdData[23] = ((gpsSportEntity.sportDistance.shr(24) and (0xff))).toByte()
+
+        //公里 	（小时）
+        cmdData[24] = (gpsSportEntity.sportSpeed and (0xff)).toByte()
+        cmdData[25] = ((gpsSportEntity.sportSpeed.shr(8) and (0xff))).toByte()
+        cmdData[26] = ((gpsSportEntity.sportSpeed.shr(16) and (0xff))).toByte()
+        cmdData[27] = ((gpsSportEntity.sportSpeed.shr(24) and (0xff))).toByte()
 
 
+
+        return cmdData
+    }
+
+    fun getOther(
+        speeds: MutableList<Int>,
+        valid: Int,
+        extremity: Int,
+        anaerobic: Int,
+        aerobic: Int,
+        burning: Int,
+        warm: Int
+    ): ByteArray {
+        val cmdData = ByteArray(228)
+        cmdData[0] = valid.toByte()
+        for (i in 1..speeds.size) {
+            cmdData[i * 2 - 1] = (speeds[i - 1] and (0xff)).toByte()
+            cmdData[i * 2] = (speeds[i - 1].shr(8) and (0xff)).toByte()
+        }
+        cmdData[101] = 0x05
+
+        cmdData[102] = (extremity and (0xff)).toByte()
+        cmdData[103] = (extremity.shr(8) and (0xff)).toByte()
+
+        cmdData[104] = (anaerobic and (0xff)).toByte()
+        cmdData[105] = (anaerobic.shr(8) and (0xff)).toByte()
+
+        cmdData[106] = (aerobic and (0xff)).toByte()
+        cmdData[107] = (aerobic.shr(8) and (0xff)).toByte()
+
+        cmdData[108] = (burning and (0xff)).toByte()
+        cmdData[109] = (burning.shr(8) and (0xff)).toByte()
+
+        cmdData[110] = (warm and (0xff)).toByte()
+        cmdData[111] = (warm.shr(8) and (0xff)).toByte()
+
+
+        return cmdData
+    }
 
 }
 

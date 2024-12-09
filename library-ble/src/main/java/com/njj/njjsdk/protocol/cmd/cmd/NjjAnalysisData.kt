@@ -720,8 +720,6 @@ object NjjAnalysisData {
     }
 
     fun parserBtName(byteArray: ByteArray, btNameCallback: NjBtNameCallback) {
-
-
         val resLength = byteArray[3].toInt() and (0xff)
         val resultByte = ByteArray(resLength)
         System.arraycopy(byteArray, 4, resultByte, 0, resLength)

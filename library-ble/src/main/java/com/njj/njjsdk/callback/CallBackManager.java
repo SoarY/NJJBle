@@ -23,6 +23,8 @@ public final class CallBackManager {
 
     //设备MAC3.0信息回调
     private List<Mac3CallBack.ICallBack> mMac3CallBackList = new ArrayList<>();
+
+    private final List<GPSCallback.ICallBack> mGPSCallback = new ArrayList<>();
     /**
      * 单例
      */
@@ -105,5 +107,23 @@ public final class CallBackManager {
 
     public List<Mac3CallBack.ICallBack> getMac3CallBackList() {
         return mMac3CallBackList;
+    }
+
+
+    /****************************************GPS回调**************************************/
+    public void registerGPSCallbackCallBack(GPSCallback.ICallBack callBack) {
+        if (!mGPSCallback.contains(callBack) && callBack != null) {
+            mGPSCallback.add(callBack);
+        }
+    }
+
+    public void unregisterGPSCallback(GPSCallback.ICallBack callBack) {
+        if (mGPSCallback.contains(callBack) && callBack != null) {
+            mGPSCallback.remove(callBack);
+        }
+    }
+
+    public List<GPSCallback.ICallBack> getGPSCallback() {
+        return mGPSCallback;
     }
 }
