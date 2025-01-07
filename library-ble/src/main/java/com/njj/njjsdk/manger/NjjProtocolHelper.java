@@ -566,4 +566,19 @@ public class NjjProtocolHelper {
         if (njjCmdToDeviceWrapper!=null)
             njjCmdToDeviceWrapper.sendStock(count,id,code,companyName,currentPrice,changePercent);
     }
+
+    public void sendIsSupport(int isSupport) {
+        if (njjCmdToDeviceWrapper!=null)
+            njjCmdToDeviceWrapper.sendIsSupport(isSupport);
+    }
+
+    public void sendTranslateContent(byte[] result) {
+        if (njjCmdToDeviceWrapper!=null)
+            njjCmdToDeviceWrapper.sendTranslateContent(result);
+    }
+
+    public void sendSpeechRecognitionContent(byte[] result,int id,int count) {
+        if (njjCmdToDeviceWrapper!=null)
+            njjCmdToDeviceWrapper.sendSpeechRecognitionContent(result,id,count);
+    }
 }

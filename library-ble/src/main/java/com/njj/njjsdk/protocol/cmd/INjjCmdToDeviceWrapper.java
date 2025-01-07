@@ -437,4 +437,13 @@ public interface INjjCmdToDeviceWrapper {
     void startGPSData(byte[] buffer);
 
     void sendStock(int count,int id,String code,String companyName,String currentPrice,String changePercent);
+
+    /**
+     * 0:支持
+     */
+    void sendIsSupport(int isSupport);
+
+    void sendTranslateContent(byte[] result);
+
+    void sendSpeechRecognitionContent(byte[] result,int id,int count);
 }

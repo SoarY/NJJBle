@@ -1338,5 +1338,53 @@ object CmdMergeImpl {
         }
     }
 
+    fun sendIsSupport(status: Int): ByteArray {
+        var bytes = createBaseCmdByte(2, EVT_TYPE_APP_RECORDING, BLE_CTRL_WRITE)
+        bytes[4] = 0
+        bytes[5] = status.toByte()
+        var checkData = 0
+        for (index in bytes.indices) {
+            if (index >= 4)
+                checkData += bytes[index].toInt()
+        }
+        bytes[bytes.size - 1] = checkData.toByte()
+        return bytes
+    }
+
+    fun sendTranslateContent(result: ByteArray): ByteArray {
+
+        var bytes = createBaseCmdByte(2 + result.size, EVT_TYPE_APP_RECORDING, BLE_CTRL_WRITE)
+
+        bytes[4] = 4//手机端回复语音识别结果
+
+        System.arraycopy(result, 0, bytes, 5, result.size)
+
+        var checkData = 0
+        for (index in bytes.indices) {
+            if (index >= 4)
+                checkData += bytes[index].toInt()
+        }
+        bytes[bytes.size - 1] = checkData.toByte()
+        return bytes
+    }
+
+    fun sendSpeechRecognitionContent(result: ByteArray, id: Int, count: Int): ByteArray {
+
+        var bytes = createBaseCmdByte(4 + result.size, EVT_TYPE_APP_RECORDING, BLE_CTRL_WRITE)
+
+        bytes[4] = 3//type
+        bytes[5] = count.toByte()
+        bytes[6] = id.toByte()
+
+        System.arraycopy(result, 0, bytes, 7, result.size)
+
+        var checkData = 0
+        for (index in bytes.indices) {
+            if (index >= 4)
+                checkData += bytes[index].toInt()
+        }
+        bytes[bytes.size - 1] = checkData.toByte()
+        return bytes
+    }
 }
 

@@ -1,6 +1,7 @@
 package com.njj.njjsdk.protocol.cmd.cmd
 
 import com.njj.njjsdk.callback.*
+import com.njj.njjsdk.entity.RecordingDataEntity
 import com.njj.njjsdk.protocol.cmd.EVT_TYPE_GPS_SPORT
 import com.njj.njjsdk.protocol.cmd.TypeConstant.*
 import com.njj.njjsdk.protocol.cmd.uitls.TimeUtil
@@ -1109,5 +1110,52 @@ object NjjAnalysisData {
         }
     }
 
+    fun parserRecording(byteArray: ByteArray): RecordingDataEntity {
+        val resLength = byteArray[3].toInt() and (0xff)
+        val resultByte = ByteArray(resLength)
+        System.arraycopy(byteArray, 4, resultByte, 0, resLength)
+
+        var recordingDataEntity = RecordingDataEntity()
+        recordingDataEntity.type = resultByte[0].toInt()
+        when (resultByte[0].toInt()) {
+            //TYPE:0:手表获取 APP 是否支持文心一言
+            0 -> {
+                //0:支持
+            }
+            //TYPE:5:手表获取 APP 是否支持翻译
+            5 -> {
+
+                var lang1 = resultByte[1].toInt()
+                var lang2 = resultByte[2].toInt()
+
+                recordingDataEntity.lang1 = lang1
+                recordingDataEntity.lang2 = lang2
+            }
+            //TYPE: 1:手表端语音传输控制“
+            //DATA: 0:开始1: 结束
+            1 -> {
+                recordingDataEntity.status = resultByte[1].toInt()
+                recordingDataEntity.session = resultByte[2].toInt()
+            }
+
+//                    TYPE: 2:语音传输数据
+//                    ID:数据包是否拆分-0:单一数据包·不为 0:拆分的 D号，需要将数据包合并
+            2 -> {
+                recordingDataEntity.id = resultByte[1].toInt()
+                /* if (recordingDataEntity.id!=0){
+                     var voiceBytes=ByteArray(resultByte.size-3);
+                     System.arraycopy(resultByte,2,voiceBytes,0,resultByte.size-1)
+                     recordingDataEntity.voiceData=resultByte;
+                 }*/
+
+                var voiceBytes = ByteArray(resultByte.size - 2);
+                System.arraycopy(resultByte, 2, voiceBytes, 0, voiceBytes.size)
+                recordingDataEntity.voiceData = voiceBytes
+
+            }
+
+        }
+        return recordingDataEntity
+    }
 
 }

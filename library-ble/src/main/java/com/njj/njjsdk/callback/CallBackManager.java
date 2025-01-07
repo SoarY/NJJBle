@@ -27,6 +27,9 @@ public final class CallBackManager {
     private final List<GPSCallback.ICallBack> mGPSCallback = new ArrayList<>();
 
     private final List<NjjStockCallback.ICallBack> mStockCallback=new ArrayList<>();
+
+    private final List<RecordingDataCallback.ICallBack> mRecordingDataCallback=new ArrayList<>();
+
     /**
      * 单例
      */
@@ -145,5 +148,22 @@ public final class CallBackManager {
 
     public List<NjjStockCallback.ICallBack> getStockCallback() {
         return mStockCallback;
+    }
+
+    /****************************************实时录音回调*************************************/
+    public void registerRecordingDataCallback(RecordingDataCallback.ICallBack callBack) {
+        if (!mRecordingDataCallback.contains(callBack) && callBack != null) {
+            mRecordingDataCallback.add(callBack);
+        }
+    }
+
+    public void unregisterRecordingDataCallback(RecordingDataCallback.ICallBack callBack) {
+        if (mRecordingDataCallback.contains(callBack) && callBack != null) {
+            mRecordingDataCallback.remove(callBack);
+        }
+    }
+
+    public List<RecordingDataCallback.ICallBack> getRecordingDataCallback() {
+        return mRecordingDataCallback;
     }
 }
