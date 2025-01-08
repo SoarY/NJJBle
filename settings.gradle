@@ -1,4 +1,5 @@
 rootProject.name = "NJJBle"
+include ':LocalRepo:jl_audio_decode'
 //include ':sample:app'
 include ':library-ble'
 
