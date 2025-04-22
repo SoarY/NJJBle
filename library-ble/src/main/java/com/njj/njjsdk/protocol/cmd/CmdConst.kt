@@ -326,6 +326,8 @@ const val EVT_TYPE_GPS_SPORT      = 124 /* GPS运动 */
 const val EVT_TYPE_MOTION_GAME               = 126/* 体感游戏 */
 const val EVT_TYPE_STOCK        = 138  /*股票*/
 const val EVT_TYPE_APP_RECORDING        = 133  /*实时语言传输*/
+const val EVT_TYPE_LOCATION        = 135  /*手表端获取定位信息*/
+
 /**
  * OTA 开始指令
  */

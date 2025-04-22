@@ -14,6 +14,7 @@ import com.njj.njjsdk.callback.NjjPushOtaCallback;
 import com.njj.njjsdk.callback.NjjStockCallback;
 import com.njj.njjsdk.callback.NjjWriteCallback;
 import com.njj.njjsdk.callback.RecordingDataCallback;
+import com.njj.njjsdk.callback.RequestLocationCallback;
 import com.njj.njjsdk.entity.RecordingDataEntity;
 import com.njj.njjsdk.library.Code;
 import com.njj.njjsdk.library.Constants;
@@ -744,6 +745,12 @@ public class NjjCmdToDeviceWrapper implements INjjCmdToDeviceWrapper {
         NjjBleManger.getInstance().writeData(bytes);
     }
 
+    @Override
+    public void sendLocationAddress(byte[] result) {
+        byte[] bytes = CmdMergeImpl.INSTANCE.sendLocationAddress(result);
+        NjjBleManger.getInstance().writeData(bytes);
+    }
+
     public void sendIsSupport(int isSupport) {
         byte[] bytes = CmdMergeImpl.INSTANCE.sendIsSupport(isSupport);
         NjjBleManger.getInstance().writeData(bytes);
@@ -1110,6 +1117,9 @@ public class NjjCmdToDeviceWrapper implements INjjCmdToDeviceWrapper {
                 break;
             case (byte) CmdConstKt.EVT_TYPE_STOCK:
                 NjjStockCallback.onReceiveData();
+                break;
+            case (byte) CmdConstKt.EVT_TYPE_LOCATION:
+                RequestLocationCallback.onReceiveData();
                 break;
             case (byte) CmdConstKt.EVT_TYPE_APP_RECORDING:
                 RecordingDataEntity recordingDataEntity = NjjAnalysisData.INSTANCE.parserRecording(value);

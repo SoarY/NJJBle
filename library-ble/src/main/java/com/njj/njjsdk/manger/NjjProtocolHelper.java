@@ -567,6 +567,11 @@ public class NjjProtocolHelper {
             njjCmdToDeviceWrapper.sendStock(count,id,code,companyName,currentPrice,changePercent);
     }
 
+    public void sendLocationAddress(byte[] result) {
+        if (njjCmdToDeviceWrapper!=null)
+            njjCmdToDeviceWrapper.sendLocationAddress(result);
+    }
+
     public void sendIsSupport(int isSupport) {
         if (njjCmdToDeviceWrapper!=null)
             njjCmdToDeviceWrapper.sendIsSupport(isSupport);

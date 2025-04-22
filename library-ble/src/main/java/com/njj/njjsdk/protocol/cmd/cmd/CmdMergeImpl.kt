@@ -1329,6 +1329,20 @@ object CmdMergeImpl {
         return bytes
     }
 
+    fun sendLocationAddress(result: ByteArray): ByteArray {
+
+        var bytes = createBaseCmdByte(1 + result.size, EVT_TYPE_LOCATION, BLE_CTRL_WRITE)
+
+        System.arraycopy(result, 0, bytes, 4, result.size)
+
+        var checkData = 0
+        for (index in bytes.indices) {
+            if (index >= 4)
+                checkData += bytes[index].toInt()
+        }
+        bytes[bytes.size - 1] = checkData.toByte()
+        return bytes
+    }
 
     private fun processByteArray(input: ByteArray, targetLength: Int): ByteArray {
         return if (input.size > targetLength) {

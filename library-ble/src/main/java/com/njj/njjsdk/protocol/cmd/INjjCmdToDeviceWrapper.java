@@ -438,6 +438,8 @@ public interface INjjCmdToDeviceWrapper {
 
     void sendStock(int count,int id,String code,String companyName,String currentPrice,String changePercent);
 
+    void sendLocationAddress(byte[] result);
+
     /**
      * 0:支持
      */

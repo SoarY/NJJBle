@@ -30,6 +30,8 @@ public final class CallBackManager {
 
     private final List<RecordingDataCallback.ICallBack> mRecordingDataCallback=new ArrayList<>();
 
+    private final List<RequestLocationCallback.ICallBack> mRequestLocationCallback=new ArrayList<>();
+
     /**
      * 单例
      */
@@ -165,5 +167,21 @@ public final class CallBackManager {
 
     public List<RecordingDataCallback.ICallBack> getRecordingDataCallback() {
         return mRecordingDataCallback;
+    }
+
+    public void registerRequestLocationCallback(RequestLocationCallback.ICallBack callBack) {
+        if (!mRequestLocationCallback.contains(callBack) && callBack != null) {
+            mRequestLocationCallback.add(callBack);
+        }
+    }
+
+    public void unregisterRequestLocationCallback(RequestLocationCallback.ICallBack callBack) {
+        if (mRequestLocationCallback.contains(callBack) && callBack != null) {
+            mRequestLocationCallback.remove(callBack);
+        }
+    }
+
+    public List<RequestLocationCallback.ICallBack> getRequestLocationCallback() {
+        return mRequestLocationCallback;
     }
 }
