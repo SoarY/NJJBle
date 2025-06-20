@@ -12,6 +12,7 @@ import com.njj.njjsdk.callback.NjjNotifyCallback;
 import com.njj.njjsdk.callback.NjjPushOtaCallback;
 import com.njj.njjsdk.callback.NjjWriteCallback;
 import com.njj.njjsdk.protocol.cmd.INjjCmdToDeviceWrapper;
+import com.njj.njjsdk.protocol.cmd.MusicConst;
 import com.njj.njjsdk.protocol.cmd.NjjCmdToDeviceWrapper;
 import com.njj.njjsdk.protocol.entity.EmergencyContact;
 import com.njj.njjsdk.protocol.entity.NJJGPSSportEntity;
@@ -585,5 +586,29 @@ public class NjjProtocolHelper {
     public void sendSpeechRecognitionContent(byte[] result,int id,int count) {
         if (njjCmdToDeviceWrapper!=null)
             njjCmdToDeviceWrapper.sendSpeechRecognitionContent(result,id,count);
+    }
+
+    /**
+     *
+     * @param playType 0 暂停  1播放
+     */
+    public void sendPlaying(int playType) {
+        if (njjCmdToDeviceWrapper!=null)
+            njjCmdToDeviceWrapper.sendPlaying(MusicConst.MusicType.BLE_MEDIA_REC_CMD_STATE,playType);
+    }
+
+    public void sendMusicVolume(int volume,int maxVolume) {
+        if (njjCmdToDeviceWrapper!=null)
+            njjCmdToDeviceWrapper.sendMusicVolume(MusicConst.MusicType.BLE_MEDIA_REC_CMD_VOLUME,volume,maxVolume);
+    }
+
+    public void sendMusicLyrics(String lyrics) {
+        if (njjCmdToDeviceWrapper!=null)
+            njjCmdToDeviceWrapper.sendMusicLyrics(MusicConst.MusicType.BLE_MEDIA_REC_CMD_LYRICS,lyrics);
+    }
+
+    public void sendMusicName(String name) {
+        if (njjCmdToDeviceWrapper!=null)
+            njjCmdToDeviceWrapper.sendMusicName(MusicConst.MusicType.BLE_MEDIA_REC_CMD_SONG_NAME,name);
     }
 }

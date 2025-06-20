@@ -3,6 +3,7 @@ package com.njj.njjsdk.protocol.cmd.cmd
 import com.njj.njjsdk.callback.*
 import com.njj.njjsdk.entity.RecordingDataEntity
 import com.njj.njjsdk.protocol.cmd.EVT_TYPE_GPS_SPORT
+import com.njj.njjsdk.protocol.cmd.MusicConst
 import com.njj.njjsdk.protocol.cmd.TypeConstant.*
 import com.njj.njjsdk.protocol.cmd.uitls.TimeUtil
 import com.njj.njjsdk.protocol.entity.*
@@ -1028,6 +1029,27 @@ object NjjAnalysisData {
         }
     }
 
+    fun parserCtrlMusic(byteArray: ByteArray) {
+        var type = byteArray[4].toInt()
+        when (type) {
+            MusicConst.MediaCtrlType.BLE_MEDIA_CTRL_PAUSE -> {
+                MusicCallback.onPause()
+            }
+            MusicConst.MediaCtrlType.BLE_MEDIA_CTRL_RESUME -> {
+                MusicCallback.onResume()
+            }
+            MusicConst.MediaCtrlType.BLE_MEDIA_CTRL_NEXT -> {
+                MusicCallback.onNext()
+            }
+            MusicConst.MediaCtrlType.BLE_MEDIA_CTRL_PREVIOUS -> {
+                MusicCallback.onPrevious()
+            }
+            MusicConst.MediaCtrlType.BLE_MEDIA_CTRL_VOLUME -> {
+                var volume = byteArray[5].toInt()
+                MusicCallback.onVolume(volume)
+            }
+        }
+    }
     fun parserGPS(byteArray: ByteArray) {
         val byte = byteArray[1].toInt() and (0xff)
 

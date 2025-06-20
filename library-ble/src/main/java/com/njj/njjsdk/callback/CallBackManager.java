@@ -32,6 +32,8 @@ public final class CallBackManager {
 
     private final List<RequestLocationCallback.ICallBack> mRequestLocationCallback=new ArrayList<>();
 
+    private final List<MusicCallback.ICallBack> mMusicCallback=new ArrayList<>();
+
     /**
      * 单例
      */
@@ -183,5 +185,21 @@ public final class CallBackManager {
 
     public List<RequestLocationCallback.ICallBack> getRequestLocationCallback() {
         return mRequestLocationCallback;
+    }
+
+    public void registerMusicCallback(MusicCallback.ICallBack callBack) {
+        if (!mMusicCallback.contains(callBack) && callBack != null) {
+            mMusicCallback.add(callBack);
+        }
+    }
+
+    public void unregisterMusicCallback(MusicCallback.ICallBack callBack) {
+        if (!mMusicCallback.contains(callBack) && callBack != null) {
+            mMusicCallback.remove(callBack);
+        }
+    }
+
+    public List<MusicCallback.ICallBack> getMusicCallback() {
+        return mMusicCallback;
     }
 }

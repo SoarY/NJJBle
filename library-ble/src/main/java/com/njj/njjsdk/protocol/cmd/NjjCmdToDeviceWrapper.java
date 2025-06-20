@@ -767,6 +767,26 @@ public class NjjCmdToDeviceWrapper implements INjjCmdToDeviceWrapper {
         NjjBleManger.getInstance().writeData(bytes);
     }
 
+    public void sendPlaying(int type,int playType) {
+        byte[] bytes = CmdMergeImpl.INSTANCE.sendPlaying(type,playType);
+        NjjBleManger.getInstance().writeData(bytes);
+    }
+
+    public void sendMusicVolume(int type,int volume,int maxVolume) {
+        byte[] bytes = CmdMergeImpl.INSTANCE.sendMusicVolume(type,volume,maxVolume);
+        NjjBleManger.getInstance().writeData(bytes);
+    }
+
+    public void sendMusicLyrics(int type,String lyrics) {
+        byte[] bytes = CmdMergeImpl.INSTANCE.sendMusicLyrics(type,lyrics);
+        NjjBleManger.getInstance().writeData(bytes);
+    }
+
+    public void sendMusicName(int type,String name) {
+        byte[] bytes = CmdMergeImpl.INSTANCE.sendMusicName(type,name);
+        NjjBleManger.getInstance().writeData(bytes);
+    }
+
     @Override
     public void startPushDial(int type, byte[] buffer, NjjPushOtaCallback callback) {
         byte[] bytes = CmdMergeImpl.INSTANCE.startSendDial(buffer, type);
@@ -1124,6 +1144,9 @@ public class NjjCmdToDeviceWrapper implements INjjCmdToDeviceWrapper {
             case (byte) CmdConstKt.EVT_TYPE_APP_RECORDING:
                 RecordingDataEntity recordingDataEntity = NjjAnalysisData.INSTANCE.parserRecording(value);
                 RecordingDataCallback.onReceiveData(recordingDataEntity);
+                break;
+            case (byte) CmdConstKt.EVT_TYPE_CTRL_MUSIC:
+                NjjAnalysisData.INSTANCE.parserCtrlMusic(value);
                 break;
         }
     }

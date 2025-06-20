@@ -448,4 +448,12 @@ public interface INjjCmdToDeviceWrapper {
     void sendTranslateContent(byte[] result);
 
     void sendSpeechRecognitionContent(byte[] result,int id,int count);
+
+    void sendPlaying(int type,int playType);
+
+    void sendMusicVolume(int type,int volume,int maxVolume);
+
+    void sendMusicLyrics(int type,String lyrics);
+
+    void sendMusicName(int type,String name);
 }

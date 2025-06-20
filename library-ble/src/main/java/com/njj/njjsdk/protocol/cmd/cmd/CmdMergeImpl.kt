@@ -1400,5 +1400,76 @@ object CmdMergeImpl {
         bytes[bytes.size - 1] = checkData.toByte()
         return bytes
     }
+
+    fun sendPlaying(type: Int, playType: Int): ByteArray {
+
+        var bytes = createBaseCmdByte(3 , EVT_TYPE_CTRL_MUSIC, BLE_CTRL_WRITE)
+
+        bytes[4] = type.toByte()
+        bytes[5] = playType.toByte()
+
+        var checkData = 0
+        for (index in bytes.indices) {
+            if (index >= 4)
+                checkData += bytes[index].toInt()
+        }
+        bytes[bytes.size - 1] = checkData.toByte()
+        return bytes
+    }
+
+    fun sendMusicVolume(type: Int, volume: Int,maxVolume: Int): ByteArray {
+
+        var bytes = createBaseCmdByte(4, EVT_TYPE_CTRL_MUSIC, BLE_CTRL_WRITE)
+
+        bytes[4] = type.toByte()
+        bytes[5] = volume.toByte()
+        bytes[6] = maxVolume.toByte()
+
+        var checkData = 0
+        for (index in bytes.indices) {
+            if (index >= 4)
+                checkData += bytes[index].toInt()
+        }
+        bytes[bytes.size - 1] = checkData.toByte()
+        return bytes
+    }
+
+    fun sendMusicLyrics(type: Int, lyrics: String): ByteArray {
+        var lyricsBytes: ByteArray =
+            if (TextUtils.isEmpty(lyrics)) ("").toByteArray(Charsets.UTF_8) else (lyrics).toByteArray(Charsets.UTF_8)
+
+        var bytes = createBaseCmdByte(2+lyricsBytes.size , EVT_TYPE_CTRL_MUSIC, BLE_CTRL_WRITE)
+
+        bytes[4] = type.toByte()
+
+        System.arraycopy(lyricsBytes, 0, bytes, 5, lyricsBytes.size)
+
+        var checkData = 0
+        for (index in bytes.indices) {
+            if (index >= 4)
+                checkData += bytes[index].toInt()
+        }
+        bytes[bytes.size - 1] = checkData.toByte()
+        return bytes
+    }
+
+    fun sendMusicName(type: Int, name: String): ByteArray {
+        var nameBytes: ByteArray =
+            if (TextUtils.isEmpty(name)) ("").toByteArray(Charsets.UTF_8) else (name).toByteArray(Charsets.UTF_8)
+
+        var bytes = createBaseCmdByte(2+nameBytes.size , EVT_TYPE_CTRL_MUSIC, BLE_CTRL_WRITE)
+
+        bytes[4] = type.toByte()
+
+        System.arraycopy(nameBytes, 0, bytes, 5, nameBytes.size)
+
+        var checkData = 0
+        for (index in bytes.indices) {
+            if (index >= 4)
+                checkData += bytes[index].toInt()
+        }
+        bytes[bytes.size - 1] = checkData.toByte()
+        return bytes
+    }
 }
 
