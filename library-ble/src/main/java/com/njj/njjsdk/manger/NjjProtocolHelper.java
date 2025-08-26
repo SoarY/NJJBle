@@ -573,6 +573,11 @@ public class NjjProtocolHelper {
             njjCmdToDeviceWrapper.addSchedule(scheduleBean);
     }
 
+    public void deleteSchedule(int id) {
+        if (njjCmdToDeviceWrapper != null)
+            njjCmdToDeviceWrapper.deleteSchedule(id);
+    }
+
 
     public void sendStock(int count,int id,String code,String companyName,String currentPrice,String changePercent) {
         if (njjCmdToDeviceWrapper!=null)
