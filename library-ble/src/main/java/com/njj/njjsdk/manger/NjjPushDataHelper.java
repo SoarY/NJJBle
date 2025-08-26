@@ -2,6 +2,7 @@ package com.njj.njjsdk.manger;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.text.TextUtils;
 
 
@@ -12,6 +13,7 @@ import com.njj.njjsdk.protocol.cmd.cmd.CmdMergeImpl;
 import com.njj.njjsdk.protocol.entity.BLEDevice;
 import com.njj.njjsdk.protocol.entity.EmergencyContact;
 import com.njj.njjsdk.protocol.entity.NJJGPSSportEntity;
+import com.njj.njjsdk.utils.BitmapUtil;
 import com.njj.njjsdk.utils.BleBeaconUtil;
 import com.njj.njjsdk.utils.LogUtil;
 import com.njj.njjsdk.utils.NJJLog;
@@ -39,8 +41,7 @@ import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-
-
+import kotlin.text.Charsets;
 
 
 /**
@@ -74,6 +75,7 @@ public class NjjPushDataHelper {
     private TimerTask task;
     //将要写入的大文件字节
     private byte[] buffer;
+    private byte[] fileNameBytes;
     private int mProgress = 0;
     private int mPosition = 0;
 
@@ -313,6 +315,88 @@ public class NjjPushDataHelper {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(observer);
     }
+
+    public void startPushBook(InputStream inputStream, String fileName, NJjPushListener pushListener) {
+        this.type = 0x33;
+        this.pushListener = pushListener;
+        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+                    checkFileAndName(inputStream, fileName);
+                    emitter.onNext(true);
+                }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(fileAndNameObserver);
+    }
+
+    public void startAlbumBitmap(String path,String fileName, int width, int height,int reducedRade, NJjPushListener pushListener) {
+        this.type = 0x34;
+        this.pushListener = pushListener;
+        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+                    checkAlbumBitmap(path, fileName, width, height,reducedRade);
+                    emitter.onNext(true);
+                }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(fileAndNameObserver);
+    }
+
+    Observer<Boolean> fileAndNameObserver = new Observer<Boolean>() {
+        @Override
+        public void onSubscribe(@NotNull Disposable d) {
+
+        }
+
+        @Override
+        public void onNext(@NotNull Boolean aBoolean) {
+            if (aBoolean) {
+                NjjProtocolHelper.getInstance().startFileAndName(type,fileNameBytes, buffer, new NjjPushOtaCallback() {
+                    @Override
+                    public void onPushError(int data, int pack) {
+                        handPushError(data, pack);
+                    }
+
+                    @Override
+                    public void onPushSuccess() {
+                        LogUtil.e("ry onPushSuccess");
+                        if (isStartPush) {
+                            handPushSuccess();
+                        }
+
+                    }
+
+                    @Override
+                    public void onPushProgress(int position) {
+                        if (type != 0x02) {
+                            HandProgress(position);
+                        }
+                    }
+
+                    @Override
+                    public void onPushStart(int pushType) {
+                        if (!isStartPush) {
+                            isStartPush = true;
+                            checkStartType();
+                            if (pushListener != null)
+                                pushListener.onPushStart();
+                        }
+
+                    }
+                });
+            } else {
+                pushListener.onPushError(9);
+            }
+        }
+
+        @Override
+        public void onError(@NotNull Throwable e) {
+            pushListener.onPushError(9);
+        }
+
+        @Override
+        public void onComplete() {
+
+        }
+    };
+
+
 
     Observer<Boolean> observer = new Observer<Boolean>() {
         @Override
@@ -638,6 +722,27 @@ public class NjjPushDataHelper {
         LogUtil.e(buffer.length + "");
 
 
+    }
+
+    private void checkFileAndName(InputStream inputStream, String fileName) throws IOException {
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        int len = 0;
+        byte[] buf = new byte[2048];
+        while ((len = bufferedInputStream.read(buf)) != -1) {
+            byteArrayOutputStream.write(buf, 0, len);
+        }
+        byteArrayOutputStream.flush();
+        buffer = byteArrayOutputStream.toByteArray();
+
+        fileNameBytes = fileName.getBytes(Charsets.UTF_16LE);
+    }
+
+    private void checkAlbumBitmap(String path, String fileName, int width, int height,int reducedRade) {
+        LogUtil.e("-------------------开始相册:");
+        buffer = BitmapUtil.resizeImage(path, (width + 15) / 16 * 16, (height + 15) / 16 * 16,reducedRade);
+        LogUtil.e("-------------------相册初始化完毕:" + buffer.length);
+        fileNameBytes = fileName.getBytes(Charsets.UTF_16LE);
     }
 
 

@@ -16,6 +16,7 @@ import com.njj.njjsdk.callback.NjjWriteCallback;
 import com.njj.njjsdk.callback.RecordingDataCallback;
 import com.njj.njjsdk.callback.RequestLocationCallback;
 import com.njj.njjsdk.entity.RecordingDataEntity;
+import com.njj.njjsdk.entity.ScheduleBean;
 import com.njj.njjsdk.library.Code;
 import com.njj.njjsdk.library.Constants;
 import com.njj.njjsdk.library.connect.response.BleNotifyResponse;
@@ -52,6 +53,7 @@ import io.reactivex.Observable;
 import io.reactivex.Observer;
 
 import static com.njj.njjsdk.protocol.cmd.CmdConstKt.EVT_TYPE_GPS_SPORT;
+import static com.njj.njjsdk.protocol.cmd.CmdConstKt.EVT_TYPE_SD_FREE_SPACE;
 import static com.njj.njjsdk.protocol.cmd.CmdConstKt.EVT_TYPE_WEATHER_FORECAST;
 
 /**
@@ -745,6 +747,23 @@ public class NjjCmdToDeviceWrapper implements INjjCmdToDeviceWrapper {
         NjjBleManger.getInstance().writeData(bytes);
     }
 
+    public void getBook() {
+        byte[] bytes = CmdMergeImpl.INSTANCE.getBook();
+        NjjBleManger.getInstance().writeData(bytes);
+    }
+
+    @Override
+    public void getSDCardSize() {
+        byte[] bytes = CmdMergeImpl.INSTANCE.getSDCardSize(EVT_TYPE_SD_FREE_SPACE);
+        NjjBleManger.getInstance().writeData(bytes);
+    }
+
+    @Override
+    public void deleteBook(int id, String name) {
+        byte[] bytes = CmdMergeImpl.INSTANCE.deleteBook(id, name);
+        NjjBleManger.getInstance().writeData(bytes);
+    }
+
     @Override
     public void sendLocationAddress(byte[] result) {
         byte[] bytes = CmdMergeImpl.INSTANCE.sendLocationAddress(result);
@@ -785,6 +804,13 @@ public class NjjCmdToDeviceWrapper implements INjjCmdToDeviceWrapper {
     public void sendMusicName(int type,String name) {
         byte[] bytes = CmdMergeImpl.INSTANCE.sendMusicName(type,name);
         NjjBleManger.getInstance().writeData(bytes);
+    }
+
+    @Override
+    public void startFileAndName(int type, byte[] fileNameBytes,byte[] binArray, NjjPushOtaCallback callback) {
+        byte[] bytes = CmdMergeImpl.INSTANCE.startSendFile(binArray,fileNameBytes, type);
+        njjPushOtaCallback = callback;
+        NjjBleManger.getInstance().writeDailRuiYu(bytes, response);
     }
 
     @Override
@@ -871,12 +897,6 @@ public class NjjCmdToDeviceWrapper implements INjjCmdToDeviceWrapper {
     };
 
     @Override
-    public void startPushContactDial(byte[] buffer) {
-        byte[] bytes = CmdMergeImpl.INSTANCE.startSendContactDial(buffer);
-        NjjBleManger.getInstance().writeData(bytes);
-    }
-
-    @Override
     public void unbind() {
         byte[] bytes = CmdMergeImpl.INSTANCE.unbind();
         NjjBleManger.getInstance().writeData(bytes);
@@ -917,6 +937,18 @@ public class NjjCmdToDeviceWrapper implements INjjCmdToDeviceWrapper {
     @Override
     public void startGPSData(byte[] buffer) {
         byte[] bytes = CmdMergeImpl.INSTANCE.startGPS(buffer);
+        NjjBleManger.getInstance().writeData(bytes);
+    }
+
+    @Override
+    public void addSchedule(ScheduleBean scheduleBean) {
+        byte[] bytes = CmdMergeImpl.INSTANCE.addSchedule(scheduleBean);
+        NjjBleManger.getInstance().writeData(bytes);
+    }
+
+    @Override
+    public void deleteSchedule(int id) {
+        byte[] bytes = CmdMergeImpl.INSTANCE.deleteSchedule(id);
         NjjBleManger.getInstance().writeData(bytes);
     }
 
@@ -1134,6 +1166,12 @@ public class NjjCmdToDeviceWrapper implements INjjCmdToDeviceWrapper {
                 break;
             case CmdConstKt.EVT_TYPE_GPS_SPORT:
                 NjjAnalysisData.INSTANCE.parserGPS(value);
+                break;
+            case (byte) CmdConstKt.EVT_TYPE_SD_BOOK_LIST:
+                NjjAnalysisData.INSTANCE.parserEBook(value);
+                break;
+            case (byte) CmdConstKt.EVT_TYPE_SD_FREE_SPACE:
+                NjjAnalysisData.INSTANCE.parserSDFreeSpace(value);
                 break;
             case (byte) CmdConstKt.EVT_TYPE_STOCK:
                 NjjStockCallback.onReceiveData();

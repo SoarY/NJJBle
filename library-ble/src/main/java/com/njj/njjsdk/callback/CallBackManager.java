@@ -26,6 +26,10 @@ public final class CallBackManager {
 
     private final List<GPSCallback.ICallBack> mGPSCallback = new ArrayList<>();
 
+    private final List<MusicAndBookCallback.ICallBack> mMusicAndBookCallback=new ArrayList<>();
+
+    private final List<SDCardCallback.ICallBack> mSDCardCallbackCallback=new ArrayList<>();
+
     private final List<NjjStockCallback.ICallBack> mStockCallback=new ArrayList<>();
 
     private final List<RecordingDataCallback.ICallBack> mRecordingDataCallback=new ArrayList<>();
@@ -148,6 +152,38 @@ public final class CallBackManager {
         if (!mStockCallback.contains(callBack) && callBack != null) {
             mStockCallback.remove(callBack);
         }
+    }
+
+    public void registerMusicAndBookCallback(MusicAndBookCallback.ICallBack callBack) {
+        if (!mMusicAndBookCallback.contains(callBack) && callBack != null) {
+            mMusicAndBookCallback.add(callBack);
+        }
+    }
+
+    public void unregisterMusicAndBookCallback(MusicAndBookCallback.ICallBack callBack) {
+        if (mMusicAndBookCallback.contains(callBack) && callBack != null) {
+            mMusicAndBookCallback.remove(callBack);
+        }
+    }
+
+    public List<MusicAndBookCallback.ICallBack> getMusicAndBookCallback() {
+        return mMusicAndBookCallback;
+    }
+
+    public void registerSDCardCallbackCallback(SDCardCallback.ICallBack callBack) {
+        if (!mSDCardCallbackCallback.contains(callBack) && callBack != null) {
+            mSDCardCallbackCallback.add(callBack);
+        }
+    }
+
+    public void unregisterSDCardCallbackCallback(SDCardCallback.ICallBack callBack) {
+        if (mSDCardCallbackCallback.contains(callBack) && callBack != null) {
+            mSDCardCallbackCallback.remove(callBack);
+        }
+    }
+
+    public List<SDCardCallback.ICallBack> getSDCardCallbackCallback() {
+        return mSDCardCallbackCallback;
     }
 
     public List<NjjStockCallback.ICallBack> getStockCallback() {

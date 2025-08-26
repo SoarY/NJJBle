@@ -1,6 +1,7 @@
 package com.njj.njjsdk.protocol.cmd.cmd
 
 import android.text.TextUtils
+import com.njj.njjsdk.entity.ScheduleBean
 import com.njj.njjsdk.protocol.cmd.*
 import com.njj.njjsdk.protocol.cmd.TypeConstant.GPS_CMD_SYN
 
@@ -538,14 +539,38 @@ object CmdMergeImpl {
     }
 
 
-    //开始发送表盘的指令
-    fun startSendDial(binArray: ByteArray): ByteArray {
-        return startSendDial(binArray, 0x01)
-    }
+    fun startSendFile(binArray: ByteArray, fileNameBytes: ByteArray, type: Int): ByteArray {
+        this.binArray = binArray
+        currentIndex = 0
+        val cmdData = ByteArray(8 + 4 + fileNameBytes.size)
+        cmdData[0] = 0xbc.toByte()
+        cmdData[1] = EVT_TYPE_OTA_START.toByte()
+        cmdData[2] = BLE_CTRL_WRITE.toByte()
+        cmdData[3] = (7 + fileNameBytes.size).toByte()
+        cmdData[4] = type.toByte()
 
-    //开始发送联系人的指令
-    fun startSendContactDial(binArray: ByteArray): ByteArray {
-        return startSendDial(binArray,0x02)
+        val totalSize = binArray.size
+        cmdData[5] = ((totalSize and (0xff))).toByte()
+        cmdData[6] = ((totalSize.shr(8) and (0xff))).toByte()
+        cmdData[7] = ((totalSize.shr(16) and (0xff))).toByte()
+        cmdData[8] = ((totalSize.shr(24) and (0xff))).toByte()
+        var packageCount = totalSize / dataLength
+        if (totalSize % dataLength != 0)
+            packageCount += 1
+
+        cmdData[9] = ((packageCount and (0xff))).toByte()
+        cmdData[10] = ((packageCount.shr(8) and (0xff))).toByte()
+
+        System.arraycopy(fileNameBytes, 0, cmdData, 11, fileNameBytes.size)
+
+        var checkData = 0
+        for (index in cmdData.indices) {
+            if (index >= 4)
+                checkData += cmdData[index].toInt()
+        }
+
+        cmdData[cmdData.size - 1] = checkData.toByte()
+        return cmdData
     }
 
     fun startSendDial(binArray: ByteArray, type: Int): ByteArray {
@@ -1222,6 +1247,7 @@ object CmdMergeImpl {
         cmdData[6] = (cmdData[4] + cmdData[5]).toByte()
         return cmdData
     }
+
     fun startGPS(binArray: ByteArray): ByteArray {
         return startSendDial(binArray, 0x06)
     }
@@ -1327,6 +1353,110 @@ object CmdMergeImpl {
         }
         bytes[bytes.size - 1] = checkData.toByte()
         return bytes
+    }
+
+    fun getBook(): ByteArray {
+        val bytes = commonControlRead(EVT_TYPE_SD_BOOK_LIST)
+        bytes[4] = 0x00.toByte()
+        bytes[5] = bytes[4]
+        return bytes
+    }
+
+    fun deleteBook(id: Int, name: String): ByteArray {
+        var nameByteArray = name.toByteArray(Charsets.UTF_16LE)
+        val bytes = ByteArray(1 + 2 + nameByteArray.size + 4 + 1)
+        bytes[0] = 0xbc.toByte()
+        bytes[1] = EVT_TYPE_SD_BOOK_LIST.toByte()
+        bytes[2] = BLE_CTRL_WRITE.toByte()
+        bytes[3] = (1 + 2 + nameByteArray.size).toByte()
+        bytes[4] = 0
+        bytes[5] = (id and (0xff)).toByte()
+        bytes[6] = ((id.shr(8) and (0xff))).toByte()
+
+        System.arraycopy(nameByteArray, 0, bytes, 7, nameByteArray.size)
+        var checkData = 0
+        for (index in bytes.indices) {
+            if (index >= 4)
+                checkData += bytes[index].toInt()
+        }
+        bytes[bytes.size - 1] = checkData.toByte()
+        return bytes
+    }
+
+    fun getSDCardSize(cmdType: Int): ByteArray {
+        val cmdData = createBaseCmdByte(2, cmdType, BLE_CTRL_READ)
+        cmdData[4] = 0
+        cmdData[5] = 0
+        return cmdData
+    }
+
+    fun addSchedule(scheduleBean: ScheduleBean): ByteArray {
+        val length = 1 + 7 + 20 + scheduleBean.details.toByteArray(Charsets.UTF_8).size
+        val cmdData =
+            createBaseCmdByte(
+                length,
+                EVT_TYPE_SCHEDULE,
+                BLE_CTRL_WRITE
+            )
+
+        cmdData[4] = scheduleBean.id.toByte()
+        cmdData[5] = 0x01
+        val tz = TimeZone.getDefault()
+        val cal = GregorianCalendar.getInstance(tz)
+        val offsetInMillis = tz.getOffset(cal.timeInMillis) / 1000
+        val startTime = scheduleBean.startTime + offsetInMillis
+        cmdData[6] = (startTime and (0xff)).toByte()
+        cmdData[7] = ((startTime.shr(8) and (0xff))).toByte()
+        cmdData[8] = ((startTime.shr(16) and (0xff))).toByte()
+        cmdData[9] = ((startTime.shr(24) and (0xff))).toByte()
+        cmdData[10] = scheduleBean.type.toByte()
+        val titleByte = ByteArray(20)
+        val dataByte = scheduleBean.title.toByteArray(Charsets.UTF_8)
+        for (index in titleByte.indices) {
+            if (index < dataByte.size) {
+                titleByte[index] = dataByte[index]
+            } else {
+                titleByte[index] = 0x00
+            }
+        }
+        System.arraycopy(titleByte, 0, cmdData, 11, titleByte.size)
+        val detailBytes = scheduleBean.details.toByteArray(Charsets.UTF_8)
+        if (detailBytes.size > 60) {
+            var data = ByteArray(60)
+            System.arraycopy(detailBytes, 0, data, 0, 60)
+            System.arraycopy(data, 0, cmdData, 31, 60)
+        } else {
+            System.arraycopy(detailBytes, 0, cmdData, 31, detailBytes.size)
+        }
+
+        var checkData = 0
+        for (index in cmdData.indices) {
+            if (index >= 4)
+                checkData += cmdData[index].toInt()
+        }
+
+        cmdData[cmdData.size - 1] = checkData.toByte()
+        return cmdData;
+    }
+
+    fun deleteSchedule(id: Int): ByteArray {
+        val length = 3
+        val cmdData =
+            createBaseCmdByte(
+                length,
+                EVT_TYPE_SCHEDULE,
+                BLE_CTRL_WRITE
+            )
+        cmdData[4] = id.toByte()
+        cmdData[5] = 0x02
+        var checkData = 0
+        for (index in cmdData.indices) {
+            if (index >= 4)
+                checkData += cmdData[index].toInt()
+        }
+
+        cmdData[cmdData.size - 1] = checkData.toByte()
+        return cmdData;
     }
 
     fun sendLocationAddress(result: ByteArray): ByteArray {

@@ -11,6 +11,7 @@ import com.njj.njjsdk.callback.NjjHomeDataCallBack;
 import com.njj.njjsdk.callback.NjjNotifyCallback;
 import com.njj.njjsdk.callback.NjjPushOtaCallback;
 import com.njj.njjsdk.callback.NjjWriteCallback;
+import com.njj.njjsdk.entity.ScheduleBean;
 import com.njj.njjsdk.protocol.cmd.INjjCmdToDeviceWrapper;
 import com.njj.njjsdk.protocol.cmd.MusicConst;
 import com.njj.njjsdk.protocol.cmd.NjjCmdToDeviceWrapper;
@@ -471,6 +472,10 @@ public class NjjProtocolHelper {
         njjCmdToDeviceWrapper.setTempUnit(isCen, callback);
     }
 
+    public void startFileAndName(int type, byte[] fileNameBytes,byte[] binArray, NjjPushOtaCallback callback) {
+        njjCmdToDeviceWrapper.startFileAndName(type, fileNameBytes,binArray, callback);
+    }
+
     /**
      * 开始写入大文件
      *
@@ -563,9 +568,33 @@ public class NjjProtocolHelper {
         njjCmdToDeviceWrapper.syncWeekWeatherTypeData(data);
     }
 
+    public void addSchedule(ScheduleBean scheduleBean) {
+        if (njjCmdToDeviceWrapper != null)
+            njjCmdToDeviceWrapper.addSchedule(scheduleBean);
+    }
+
+
     public void sendStock(int count,int id,String code,String companyName,String currentPrice,String changePercent) {
         if (njjCmdToDeviceWrapper!=null)
             njjCmdToDeviceWrapper.sendStock(count,id,code,companyName,currentPrice,changePercent);
+    }
+
+    public void getBook() {
+        if (njjCmdToDeviceWrapper != null)
+            njjCmdToDeviceWrapper.getBook();
+    }
+
+    /**
+     * 获取SD卡剩余空间
+     */
+    public void getSDCardSize() {
+        if (njjCmdToDeviceWrapper != null)
+            njjCmdToDeviceWrapper.getSDCardSize();
+    }
+
+    public void deleteBook(int id, String name) {
+        if (njjCmdToDeviceWrapper != null)
+            njjCmdToDeviceWrapper.deleteBook(id, name);
     }
 
     public void sendLocationAddress(byte[] result) {

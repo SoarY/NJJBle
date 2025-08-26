@@ -11,6 +11,7 @@ import com.njj.njjsdk.callback.NjjHomeDataCallBack;
 import com.njj.njjsdk.callback.NjjNotifyCallback;
 import com.njj.njjsdk.callback.NjjPushOtaCallback;
 import com.njj.njjsdk.callback.NjjWriteCallback;
+import com.njj.njjsdk.entity.ScheduleBean;
 import com.njj.njjsdk.protocol.entity.EmergencyContact;
 import com.njj.njjsdk.protocol.entity.NJJGPSSportEntity;
 import com.njj.njjsdk.protocol.entity.NJJWeatherData;
@@ -374,12 +375,15 @@ public interface INjjCmdToDeviceWrapper {
     void setTempUnit(boolean isCen, NjjWriteCallback callback);
 
 
-    /**
-     * 开始推送表盘,瑞昱的
-     *
-     * @return void
-     * @date 2022-4-19 14:31:01
-     */
+    void startFileAndName(int type, byte[] fileNameBytes,byte[] binArray, NjjPushOtaCallback callback);
+
+
+        /**
+         * 开始推送表盘,瑞昱的
+         *
+         * @return void
+         * @date 2022-4-19 14:31:01
+         */
     void startPushDial(int type, byte[] buffer, NjjPushOtaCallback callback);
 
     void startPushBigDial(int type, byte[] buffer, NjjPushOtaCallback callback);
@@ -389,14 +393,6 @@ public interface INjjCmdToDeviceWrapper {
      * @param callBack
      */
     void getDeviceConfig1(NjjConfig1CallBack callBack);
-
-    /**
-     * 开始推送联系人
-     *
-     * @return void
-     * @date 2022-4-19 14:31:01
-     */
-    void startPushContactDial(byte[] buffer);
 
     /***
      * 解除绑定
@@ -436,7 +432,20 @@ public interface INjjCmdToDeviceWrapper {
 
     void startGPSData(byte[] buffer);
 
+    void addSchedule(ScheduleBean scheduleBean);
+
+    void deleteSchedule(int id);
+
     void sendStock(int count,int id,String code,String companyName,String currentPrice,String changePercent);
+
+    void getBook();
+
+    /**
+     * 获取SD卡剩余空间
+     */
+    void getSDCardSize();
+
+    void deleteBook(int id, String name);
 
     void sendLocationAddress(byte[] result);
 
