@@ -5,6 +5,7 @@ import com.njj.njjsdk.entity.BleBigFileEntity
 import com.njj.njjsdk.entity.RecordingDataEntity
 import com.njj.njjsdk.protocol.cmd.EVT_TYPE_GPS_SPORT
 import com.njj.njjsdk.protocol.cmd.EVT_TYPE_SD_BOOK_LIST
+import com.njj.njjsdk.protocol.cmd.EVT_TYPE_SD_MUSIC_LIST
 import com.njj.njjsdk.protocol.cmd.MusicConst
 import com.njj.njjsdk.protocol.cmd.TypeConstant.*
 import com.njj.njjsdk.protocol.cmd.uitls.TimeUtil
@@ -1132,6 +1133,32 @@ object NjjAnalysisData {
             }
 
         }
+    }
+
+    fun parserLocalMusic(byteArray: ByteArray) {
+        val resLength = byteArray[3].toInt() and (0xff)
+        val resultByte = ByteArray(resLength)
+
+        var curId1 = resultByte[0].toInt() and 0xff
+        var curId2 = (resultByte[1].toInt() and 0xff).shl(8)
+        var curId = curId1 + curId2
+
+        var totalId1 = resultByte[2].toInt() and 0xff
+        var totalId2 = (resultByte[3].toInt() and 0xff).shl(8)
+        var totalId = totalId1 + totalId2
+
+        val nameByte = ByteArray(byteArray[3] - 4)
+        System.arraycopy(resultByte, 4, nameByte, 0, nameByte.size)
+
+        var name = nameByte.toString(Charsets.UTF_16LE)
+
+        var bleBigFileEntity = BleBigFileEntity()
+
+        bleBigFileEntity.curId = curId.toInt()
+        bleBigFileEntity.totalId = totalId.toInt()
+        bleBigFileEntity.name = name
+
+        MusicAndBookCallback.onReceivedData(EVT_TYPE_SD_MUSIC_LIST, bleBigFileEntity)
     }
 
     fun parserEBook(byteArray: ByteArray) {

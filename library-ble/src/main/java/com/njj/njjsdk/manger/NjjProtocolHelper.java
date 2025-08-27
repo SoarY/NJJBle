@@ -602,6 +602,16 @@ public class NjjProtocolHelper {
             njjCmdToDeviceWrapper.deleteBook(id, name);
     }
 
+    public void getMusic() {
+        if (njjCmdToDeviceWrapper != null)
+            njjCmdToDeviceWrapper.getMusic();
+    }
+
+    public void deleteMusic(int id, String name) {
+        if (njjCmdToDeviceWrapper != null)
+            njjCmdToDeviceWrapper.deleteMusic(id, name);
+    }
+
     public void sendLocationAddress(byte[] result) {
         if (njjCmdToDeviceWrapper!=null)
             njjCmdToDeviceWrapper.sendLocationAddress(result);

@@ -765,6 +765,18 @@ public class NjjCmdToDeviceWrapper implements INjjCmdToDeviceWrapper {
     }
 
     @Override
+    public void getMusic() {
+        byte[] bytes = CmdMergeImpl.INSTANCE.getMusic();
+        NjjBleManger.getInstance().writeData(bytes);
+    }
+
+    @Override
+    public void deleteMusic(int id, String name) {
+        byte[] bytes = CmdMergeImpl.INSTANCE.deleteMusic(id, name);
+        NjjBleManger.getInstance().writeData(bytes);
+    }
+
+    @Override
     public void sendLocationAddress(byte[] result) {
         byte[] bytes = CmdMergeImpl.INSTANCE.sendLocationAddress(result);
         NjjBleManger.getInstance().writeData(bytes);
@@ -1166,6 +1178,9 @@ public class NjjCmdToDeviceWrapper implements INjjCmdToDeviceWrapper {
                 break;
             case CmdConstKt.EVT_TYPE_GPS_SPORT:
                 NjjAnalysisData.INSTANCE.parserGPS(value);
+                break;
+            case (byte) CmdConstKt.EVT_TYPE_SD_MUSIC_LIST:
+                NjjAnalysisData.INSTANCE.parserLocalMusic(value);
                 break;
             case (byte) CmdConstKt.EVT_TYPE_SD_BOOK_LIST:
                 NjjAnalysisData.INSTANCE.parserEBook(value);

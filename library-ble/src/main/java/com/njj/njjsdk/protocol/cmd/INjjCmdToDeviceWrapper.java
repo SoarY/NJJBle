@@ -447,6 +447,10 @@ public interface INjjCmdToDeviceWrapper {
 
     void deleteBook(int id, String name);
 
+    void getMusic();
+
+    void deleteMusic(int id, String name);
+
     void sendLocationAddress(byte[] result);
 
     /**

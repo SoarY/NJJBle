@@ -316,6 +316,17 @@ public class NjjPushDataHelper {
                 .subscribe(observer);
     }
 
+    public void startPushMusic(InputStream inputStream, String fileName, NJjPushListener pushListener) {
+        this.type = 0x32;
+        this.pushListener = pushListener;
+        Observable.create((ObservableOnSubscribe<Boolean>) emitter -> {
+                    checkFileAndName(inputStream, fileName);
+                    emitter.onNext(true);
+                }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(fileAndNameObserver);
+    }
+
     public void startPushBook(InputStream inputStream, String fileName, NJjPushListener pushListener) {
         this.type = 0x33;
         this.pushListener = pushListener;

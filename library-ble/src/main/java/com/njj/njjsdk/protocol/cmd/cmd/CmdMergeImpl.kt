@@ -1362,6 +1362,34 @@ object CmdMergeImpl {
         return bytes
     }
 
+    fun getMusic(): ByteArray {
+        val bytes = commonControlRead(EVT_TYPE_SD_MUSIC_LIST)
+        bytes[4] = 0x00.toByte()
+        bytes[5] = bytes[4]
+        return bytes
+    }
+
+    fun deleteMusic(id: Int, name: String): ByteArray {
+        var nameByteArray = name.toByteArray(Charsets.UTF_16LE)
+        val bytes = ByteArray(1 + 2 + nameByteArray.size + 4 + 1)
+        bytes[0] = 0xbc.toByte()
+        bytes[1] = EVT_TYPE_SD_MUSIC_LIST.toByte()
+        bytes[2] = BLE_CTRL_WRITE.toByte()
+        bytes[3] = (1 + 2 + nameByteArray.size).toByte()
+        bytes[4] = 0
+        bytes[5] = (id and (0xff)).toByte()
+        bytes[6] = ((id.shr(8) and (0xff))).toByte()
+
+        System.arraycopy(nameByteArray, 0, bytes, 7, nameByteArray.size)
+        var checkData = 0
+        for (index in bytes.indices) {
+            if (index >= 4)
+                checkData += bytes[index].toInt()
+        }
+        bytes[bytes.size - 1] = checkData.toByte()
+        return bytes
+    }
+
     fun deleteBook(id: Int, name: String): ByteArray {
         var nameByteArray = name.toByteArray(Charsets.UTF_16LE)
         val bytes = ByteArray(1 + 2 + nameByteArray.size + 4 + 1)
