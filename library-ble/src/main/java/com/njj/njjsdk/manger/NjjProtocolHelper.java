@@ -579,6 +579,15 @@ public class NjjProtocolHelper {
     }
 
 
+    /**
+     *
+     * @param count 总数量
+     * @param id 本次发送index
+     * @param code 股票代码
+     * @param companyName 股票名称
+     * @param currentPrice 当前股票价格
+     * @param changePercent 涨幅值
+     */
     public void sendStock(int count,int id,String code,String companyName,String currentPrice,String changePercent) {
         if (njjCmdToDeviceWrapper!=null)
             njjCmdToDeviceWrapper.sendStock(count,id,code,companyName,currentPrice,changePercent);
