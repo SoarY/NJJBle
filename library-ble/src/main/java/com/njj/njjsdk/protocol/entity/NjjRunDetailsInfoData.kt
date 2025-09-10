@@ -33,4 +33,5 @@ class NjjRunDetailsInfoData : Any(){
      var stepNum //步数
             = 0
 
+     var heartRateArr:String?=null//心率数组
 }

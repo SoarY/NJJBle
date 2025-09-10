@@ -433,6 +433,26 @@ object NjjAnalysisData {
                 val sportDistances =
                     (sportDistance + sportDistance2 + sportDistance3 + sportDistance4) / 10
 
+                var arrayList = ""
+                if (byteArray.size > 28 + index) {
+                    var time = sportTimeDuration / 60
+
+                    if (time > 120) {
+                        time = 120
+                    }
+
+
+                    for (i in 0 until time) {
+                        if (i == 0) {
+                            arrayList =
+                                (byteArray[index + 28 + i].toInt() and 0xff).toString()
+                        }
+                        arrayList =
+                            arrayList + "," + (byteArray[index + 28 + i].toInt() and 0xff).toString()
+                    }
+                }
+
+                njySportData.heartRateArr = arrayList
                 njySportData.heartRate = sportHr
                 njySportData.stepNum = sportSteps
                 njySportData.kcal = sportCals
